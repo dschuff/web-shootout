@@ -79,7 +79,7 @@ L(here):
 ')
 
 	shr	%edx				C set cy flag
-	jmp	*%eax
+	nacljmp	%eax
 
 ifdef(`PIC',`
 L(pic_calc):

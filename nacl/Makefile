@@ -1,4 +1,4 @@
-NACL_SDK_PATH ?= /ulg/native_client_sdk_0_5_984
+NACL_SDK ?= /ulg/native_client_sdk_0_5_984
 # NACL_SVN_PATH only needed if we want to build with glibc
 NACL_SVN_PATH ?= /ulg/naclgit/native_client
 CC = gcc
@@ -20,7 +20,7 @@ endif
 ifeq ($(LIB),glibc)
   NACL_CC_PATH = $(NACL_SVN_PATH)/toolchain/linux_x86/bin
 else
-  NACL_CC_PATH = $(NACL_SDK_PATH)/toolchain/linux_x86/bin
+  NACL_CC_PATH = $(NACL_SDK)/toolchain/linux_x86/bin
 endif
 
 NACLCC = $(NACL_CC_PATH)/$(NACL_CC_BASE)-gcc
@@ -29,7 +29,7 @@ CCFLAGS ?= -O3 -g -mfpmath=sse -msse3 -march=nocona
 CFLAGS = $(CCFLAGS) -std=gnu99
 CXXFLAGS = $(CCFLAGS)
 LIBS = -lm -lpthread
-
+LIBDIR = ../third_party/libinstall/$(BITS)/lib
 
 
 BENCHMARKS := fannkuchredux fasta revcomp binarytrees knucleotide nbody \
@@ -54,11 +54,11 @@ all: native
 	pnacl-gcc -c $(CFLAGS) $< -o $@
 
 native: $(OBJS_NATIVE)
-	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) -o benchmarks $(LIBS) -lgmp
+	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) -o benchmarks$(BITS) $(LIBS) -lgmp
 
 nacl: $(OBJS_NACL)
-#	$(NACLCXX) $(OBJS_NACL) -o benchmarks.nexe -Llib -lgmp$(BITS) $(LIBS)
-	$(NACLCXX) $(OBJS_NACL) -o benchmarks.nexe -Llib $(LIBS) -lgmp$(BITS) -ltcmalloc_minimal$(BITS) -lpthread
+	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) -lgmp $(LIBS)
+#	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) $(LIBS) -lgmp -ltcmalloc_minimal -lpthread
 
 pnacl: $(OBJS_PNACL)
 	pnacl-g++ $(OBJS_PNACL) -o benchmarks.pexe -ltcmalloc_minimal -lpthread
@@ -66,17 +66,17 @@ pnacl: $(OBJS_PNACL)
 	pnacl-translate -arch $(PNACL_ARCH) benchmarks.pexe -o benchmarks_pnacl.nexe
 
 clean-native:
-	rm -f $(OBJS_NATIVE) benchmarks
+	rm -f $(OBJS_NATIVE) benchmarks32 benchmarks64
 clean-nacl:
-	rm -f $(OBJS_NACL) benchmarks.nexe
+	rm -f $(OBJS_NACL) benchmarks$(BITS).nexe
 clean-pnacl:
 	rm -f $(OBJS_PNACL) *.pexe benchmarks_pnacl.nexe *.ll *-.o
-clean: clean-native clean-nacl clean-pnacl
+clean: clean-native clean-nacl
 
 
 run-native:
-	./benchmarks
+	./benchmarks$(BITS)
 run-nacl:
-	$(NACL_CC_PATH)/sel_ldr_x86_$(BITS) -a benchmarks.nexe
+	$(NACL_CC_PATH)/sel_ldr_x86_$(BITS) -a benchmarks$(BITS).nexe
 
 .PHONY: clean-native clean-nacl clean-pnacl run-native run-nacl

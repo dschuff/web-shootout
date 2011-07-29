@@ -513,7 +513,7 @@ L(unroll_outer_entry):
 	xorl	%eax, %ebx		C carries other way for odd index
 	xorl	%eax, %ecx
 
-	jmp	*%edx
+	nacljmp	%edx
 
 
 C -----------------------------------------------------------------------------

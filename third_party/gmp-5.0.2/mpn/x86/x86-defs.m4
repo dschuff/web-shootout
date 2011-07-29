@@ -298,7 +298,8 @@ dnl  getting %eip for PIC.
 
 define(ret_internal,
 m4_assert_numargs(-1)
-``ret'')
+``popl %ecx; nacljmp %ecx'')
+dnl``ret'')
 
 
 dnl  Usage: ret_instrument

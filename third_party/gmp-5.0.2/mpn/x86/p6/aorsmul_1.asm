@@ -229,7 +229,7 @@ L(here):
 	cmovnz(	%ebx, %ecx)	C high,low carry other way around
 	cmovnz(	%eax, %ebx)
 
-	jmp	*%edx
+	nacljmp	%edx
 
 
 ifdef(`PIC',`
