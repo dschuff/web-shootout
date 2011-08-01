@@ -57,8 +57,8 @@ native: $(OBJS_NATIVE)
 	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) -o benchmarks$(BITS) $(LIBS) -lgmp
 
 nacl: $(OBJS_NACL)
-	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) -lgmp $(LIBS)
-#	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) $(LIBS) -lgmp -ltcmalloc_minimal -lpthread
+#	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) -lgmp $(LIBS)
+	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) $(LIBS) -lgmp -ltcmalloc_minimal -lpthread
 
 pnacl: $(OBJS_PNACL)
 	pnacl-g++ $(OBJS_PNACL) -o benchmarks.pexe -ltcmalloc_minimal -lpthread
@@ -66,9 +66,9 @@ pnacl: $(OBJS_PNACL)
 	pnacl-translate -arch $(PNACL_ARCH) benchmarks.pexe -o benchmarks_pnacl.nexe
 
 clean-native:
-	rm -f $(OBJS_NATIVE) benchmarks32 benchmarks64
+	rm -f $(OBJS_NATIVE)
 clean-nacl:
-	rm -f $(OBJS_NACL) benchmarks$(BITS).nexe
+	rm -f $(OBJS_NACL)
 clean-pnacl:
 	rm -f $(OBJS_PNACL) *.pexe benchmarks_pnacl.nexe *.ll *-.o
 clean: clean-native clean-nacl
@@ -80,3 +80,5 @@ run-nacl:
 	$(NACL_CC_PATH)/sel_ldr_x86_$(BITS) -a benchmarks$(BITS).nexe
 
 .PHONY: clean-native clean-nacl clean-pnacl run-native run-nacl
+
+.PRECIOUS: benchmarks32.nexe benchmarks64.nexe benchmarks32 benchmarks64

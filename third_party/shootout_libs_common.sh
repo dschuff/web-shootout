@@ -69,6 +69,8 @@ setup-naclgcc() {
     CXX="${tc_base}/${gcc_prefix}-nacl-g++ ${flags}" \
     LD="${tc_base}/${gcc_prefix}-nacl-ld ${flags}" \
     RANLIB="${tc_base}/${gcc_prefix}-nacl-ranlib" \
+    AR="${tc_base}/${gcc_prefix}-nacl-ar" \
+    OBJCOPY="${tc_base}/${gcc_prefix}-nacl-objcopy" \
     NM="nm")
 }
 

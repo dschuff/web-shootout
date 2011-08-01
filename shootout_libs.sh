@@ -31,3 +31,15 @@ for arch in x86-32 x86-64; do
     popd
   done
 done
+
+# wget package
+pushd third_party
+wget http://nacl-llvm-branches.googlecode.com/files/google-perftools-nacl-1.8.tgz
+tar -xzf google-perftools-nacl-1.8.tgz
+popd
+cp third_party/build_tcmalloc_nacl.sh third_party/google-perftools
+for arch in x86-32 x86-64; do
+ pushd third_party/google-perftools
+ NACL_ARCH=$arch ./build_tcmalloc_nacl.sh all
+ popd
+done
