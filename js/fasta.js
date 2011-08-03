@@ -79,12 +79,14 @@ function FastaBenchmark(n) {
   ResetLast();
   fasta_main(n);
   CleanupPrint();
+
   if (first_run) {
-      if (n == 100000) VerifyOutput(fasta_ref_output, true);
+      if (n == 10000) VerifyOutput(fasta_ref_output, true);
       else VerifyOutput("", true);
   } else {
       VerifyOutput(fasta_ref_output, false);
   }
+  first_run = false;
 }
 
 var Fasta = new BenchmarkSuite('Fasta', 40400, [

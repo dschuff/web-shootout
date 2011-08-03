@@ -4,7 +4,6 @@
 //  Contributed by Matthew Wilson 
 //  biginteger derived from Tom Wu's jsbn.js
 
-load('io_replacement.js')
 
 var compareTo, multiply, divide, addTo, add, intValue, shiftLeft, nbv;
 
@@ -39,7 +38,6 @@ function pidigits($n) {
 }
 
 var functions;
-load('biginteger.js');
 
 compareTo=functions[0];
 multiply=functions[1];

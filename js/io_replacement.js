@@ -3,12 +3,24 @@
 // Benchmarks which use print must call InitializePrint, call print,
 // and then call VerifyOutput with the appropriate argument
 
-load("fasta_10k_ref_output.js");
-
 var fasta_output = "";
 var fasta_output_array;
 
 var print_output;
+
+function null_print(s) {
+}
+function AppendDebug(text) {
+  var debug = document.getElementById("debug");
+  console.log(debug);
+  debug.innterHTML += (text + "</br>");
+}
+// In the browser, we want to use something other than print() (which
+// prints to the printer). as the real_print
+if (typeof window != 'undefined') {
+    //print = AppendDebug;
+    print = null_print;
+}
 var real_print = print;
 function fake_print(s) {
   print_output.push(s);
@@ -26,15 +38,15 @@ function VerifyOutput(ref_input, keep_fasta_output) {
 
   if(!ref_input) return;
   if(ref_input != output) {
-    print("Error, expected\n");
-    print(ref_input);
-    print("got\n");
-    print(output);
+    real_print("Error, expected\n");
+    real_print(ref_input);
+    real_print("got\n");
+    real_print(output);
     throw "error";
   }
   if (keep_fasta_output) {
     fasta_output = output;
-    fasta_output_array = fasta_output.split("\n");
+    fasta_output_array = print_output;
   }
   //print(output);
 }
@@ -42,6 +54,9 @@ function VerifyOutput(ref_input, keep_fasta_output) {
 // Several benchmarks use the output of fasta as their input.
 // We replace readline with a function that reads from this reference data
 var start_index = 0;
+if (typeof readline == 'undefined') {
+    readline = null;
+}
 var real_readline = readline;
 
 function readline_string() {//doesn't work?

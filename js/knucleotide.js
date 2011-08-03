@@ -3,7 +3,9 @@ The Computer Language Shootout
 http://shootout.alioth.debian.org/  
 Contributed by Jesse Millikan    
 */
-load('io_replacement.js');//loaded in run.js
+
+// Needs io_replacement loaded
+
 // Return hash t with frequency in "n"
 function frequency(seq, length){
  var m, i, t = {}, n = seq.length - length + 1

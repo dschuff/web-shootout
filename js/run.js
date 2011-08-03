@@ -27,7 +27,10 @@
 
 
 load('base.js');
+load("fasta_10k_ref_output.js");
 load('io_replacement.js');
+load('biginteger.js');
+
 load('fannkuchredux.js');
 load('fasta.js');
 load('revcomp.js');

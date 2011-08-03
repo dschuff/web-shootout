@@ -4,11 +4,10 @@ http://shootout.alioth.debian.org/
 Contributed by Matthew Wilson
 */
 
-//load('io_replacement.js');//loaded from run.js
+//load('io_replacement.js');//loaded from run.js; uncomment to run standalone
 
 function revcomp_main(complement,print,readline) {
   var l, seq="";
-  print(l = readline());
   for (;;) { try {
     if ((l = readline()).length == 60) {
       seq += l;
