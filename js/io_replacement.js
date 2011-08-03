@@ -21,6 +21,9 @@ if (typeof window != 'undefined') {
     //print = AppendDebug;
     print = null_print;
 }
+if (typeof print == 'undefined') {
+    print = null_print;
+}
 var real_print = print;
 function fake_print(s) {
   print_output.push(s);

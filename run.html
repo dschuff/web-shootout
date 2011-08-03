@@ -7,32 +7,17 @@
 <meta http-equiv="Content-Style-Type" content="text/css">
 <title>Web-shootout Benchmark Suite</title>
 <script type="text/javascript" src="js/base.js"></script>
-<script type="text/javascript" src="js/fasta_10k_ref_output.js"></script>
-<script type="text/javascript" src="js/io_replacement.js"></script>
-<script type="text/javascript" src="js/biginteger.js"></script>
-<script type="text/javascript" src="js/fannkuchredux.js"></script>
-<script type="text/javascript" src="js/fasta.js"></script>
-<script type="text/javascript" src="js/revcomp.js"></script>
-<script type="text/javascript" src="js/binarytrees.js"></script>
-<script type="text/javascript" src="js/knucleotide.js"></script>
-<script type="text/javascript" src="js/nbody.js"></script>
-<script type="text/javascript" src="js/spectralnorm.js"></script>
-<script type="text/javascript" src="js/pidigits.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript">
-var completed = 0;
-var benchmarks = BenchmarkSuite.CountBenchmarks();
 var success = true;
 
-function ShowProgress(name) {
+function ShowProgress(text) {
   var status = document.getElementById("status");
-  var percentage = ((++completed) / benchmarks) * 100;
-  status.innerHTML = "Running: " + Math.round(percentage) + "% completed.";
+  status.innerHTML = text;
 }
 
 
-function AddResult(name, result) {
-  var text = name + ': ' + result;
+function AddResult(text) {
   var results = document.getElementById("results");
   results.innerHTML += (text + "<br>");
 }
@@ -51,13 +36,6 @@ function AddScore(score) {
   }
 }
 
-
-function Run() {
-  BenchmarkSuite.RunSuites({ NotifyStep: ShowProgress,
-                             NotifyError: AddError,
-                             NotifyResult: AddResult,
-                             NotifyScore: AddScore }); 
-}
 
 function ShowWarningIfObsolete() {
   // If anything goes wrong we will just catch the exception and no 
@@ -88,8 +66,33 @@ function Load() {
   var version = BenchmarkSuite.version;
   document.getElementById("version").innerHTML = version;
   ShowWarningIfObsolete();  
-  setTimeout(Run, 200);
 }
+
+var worker = new Worker('js/worker.js');
+worker.addEventListener('message', function(e) {
+  console.log('Worker said: ', e.data);
+  var msgtype = e.data.type;
+  var msg = e.data.msg;
+  switch (msgtype) {
+    case "status":
+      ShowProgress(msg);
+      break;
+    case "result":
+      AddResult(msg);
+      break;
+    case "error":
+      AddError(msg);
+      break;
+    case "score":
+      AddScore(msg);
+      break;
+    default:
+      alert("couldn't determine type of worker message");
+  }
+}, false);
+
+worker.postMessage({'type':'start', 'msg':''}); // Start the worker.
+
 
 </script>
 </head>
@@ -134,7 +137,7 @@ the <a href="http://v8.googlecode.com/svn/data/benchmarks/current/revisions.html
 
 </td><td style="text-align: center">
 <div class="run">
-  <div id="status">Starting...</div>
+  <div id="status">Starting in WebWorker...</div>
   <div id="results">
   </div>
   <!--<div id="debug">Debug output:</div>-->
