@@ -4,6 +4,7 @@
 #define MAX_BENCHMARKS 8
 
 typedef int (*bench_function)(int);
+typedef int (*report_function)(char *, ...);
 
 typedef struct _bench_info {
   char *name;
@@ -35,6 +36,9 @@ int run_nbody(int p);
 int run_pidigits(int p);
 int run_spectralnorm(int p);
 
-#define memcpy(d, s, n)    __builtin_memcpy ((d), (s), (n))
+int framework_main();
+void ReportStatus(const char *format, ...);
+
+//#define memcpy(d, s, n)    __builtin_memcpy ((d), (s), (n))
 
 #endif

@@ -7,6 +7,7 @@
 <meta http-equiv="Content-Style-Type" content="text/css">
 <title>Web-shootout Benchmark Suite</title>
 <script type="text/javascript" src="js/base.js"></script>
+<script type="text/javascript" src="js/nacl.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript">
 var success = true;
@@ -91,12 +92,14 @@ worker.addEventListener('message', function(e) {
   }
 }, false);
 
-worker.postMessage({'type':'start', 'msg':''}); // Start the worker.
+function runJSBenchmarks() {
+  worker.postMessage({'type':'start', 'msg':''}); // Start the worker.
+}
 
 
 </script>
 </head>
-<body onload="Load()">
+<body onload="Load(); pageDidLoad();">
 <div>
   <div class="title"><h1>Web-shootout Benchmark Suite - version <span id="version">?</span></h1></div>
   <div class="warning" id="obsolete"> 
@@ -137,10 +140,52 @@ the <a href="http://v8.googlecode.com/svn/data/benchmarks/current/revisions.html
 
 </td><td style="text-align: center">
 <div class="run">
-  <div id="status">Starting in WebWorker...</div>
+  <form name="JSBenchmarkForm" action="" method="get">
+    <input type="button" value="Start JS Benchmarks" onclick="runJSBenchmarks()" />
+  </form>
+  <h3>JS Status:</h3>
+  <div id="status">No status</div>
   <div id="results">
   </div>
-  <!--<div id="debug">Debug output:</div>-->
+</div>
+<div class="run">
+  <h3>NaCl Status:</h3>
+  <div id="statusField">No status</div>
+  <form name="helloForm"
+        action=""
+        method="get"
+        onsubmit="return reverseText()">
+    <input type="text" id="inputBox" name="inputBox" value="Hello world" /><p>
+    <input type="button" value="Call fortyTwo()" onclick="fortyTwo()" />
+    <input type="submit" value="Call reverseText()" />
+    <input type="button" value="Start NaCl benchmarks" onclick="runNaclBenchmarks()"/>
+  </form>
+  <!-- Load the published .nexe.  This includes the 'src' attribute which
+  shows how to load multi-architecture modules.  Each entry in the "nexes"
+  object in the  .nmf manifest file is a key-value pair: the key is the runtime
+  ('x86-32', 'x86-64', etc.); the value is a URL for the desired NaCl module.
+  To load the debug versions of your .nexes, set the 'src' attribute to the
+  _dbg.nmf version of the manifest file.
+
+  Note that the <EMBED> element is wrapped inside a <DIV>, which has a 'load'
+  event listener attached.  This method is used instead of attaching the 'load'
+  event listener directly to the <EMBED> element to ensure that the listener
+  is active before the NaCl module 'load' event fires.
+  -->
+  <div id="listener">
+    <script type="text/javascript">
+      document.getElementById('listener')
+          .addEventListener('load', moduleDidLoad, true);
+    </script>
+
+    <embed name="nacl_module"
+           id="hello_world"
+           width=0 height=0
+           src="benchmark.nmf"
+           type="application/x-nacl" />
+  </div>
+  <div id="naclResults">
+  </div>
 </div>
 </td></tr></table>
 

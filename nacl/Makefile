@@ -40,7 +40,7 @@ OBJS_NATIVE := $(BENCHMARKS:%=%.native.o) $(OTHER_OBJS:%=%.native.o)
 OBJS_NACL := $(BENCHMARKS:%=%.nacl.o) $(OTHER_OBJS:%=%.nacl.o)
 OBJS_PNACL := $(BENCHMARKS:%=%.bc) $(OTHER_OBJS:%=%.bc)
 
-all: native
+all: native nacl
 
 %.native.o: %.c
 	$(CC) $(ARCH_FLAG) -Iinclude -c $(CFLAGS) $< -o $@
@@ -53,24 +53,31 @@ all: native
 %.bc: %.c
 	pnacl-gcc -c $(CFLAGS) $< -o $@
 
-native: $(OBJS_NATIVE)
+native: $(OBJS_NATIVE) cli.native.o
 	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) -o benchmarks$(BITS) $(LIBS) -lgmp
 
-nacl: $(OBJS_NACL)
-#	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) -lgmp $(LIBS)
-	$(NACLCXX) $(OBJS_NACL) -o benchmarks$(BITS).nexe -L$(LIBDIR) $(LIBS) -lgmp -ltcmalloc_minimal -lpthread
+nacl: benchmarks$(BITS).nexe benchmarks_browser$(BITS).nexe
+pepper: benchmarks_browser$(BITS).nexe
 
-pnacl: $(OBJS_PNACL)
+benchmarks$(BITS).nexe: $(OBJS_NACL) cli.nacl.o
+#	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) -lgmp $(LIBS)
+	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) $(LIBS) -lgmp -ltcmalloc_minimal -lpthread
+
+benchmarks_browser$(BITS).nexe: $(OBJS_NACL) pepper.nacl.o
+	$(NACLCXX) $(OBJS_NACL)  pepper.nacl.o -o $@ -L$(LIBDIR) $(LIBS) -lppapi -lgmp -ltcmalloc_minimal -lpthread
+	chmod a+r *.nexe
+
+pnacl: $(OBJS_PNACL) cli.bc
 	pnacl-g++ $(OBJS_PNACL) -o benchmarks.pexe -ltcmalloc_minimal -lpthread
 	pnacl-opt -std-link-opts -disable-internalize benchmarks.pexe -o benchmarks.pexe
 	pnacl-translate -arch $(PNACL_ARCH) benchmarks.pexe -o benchmarks_pnacl.nexe
 
 clean-native:
-	rm -f $(OBJS_NATIVE)
+	rm -f *.native.o
 clean-nacl:
-	rm -f $(OBJS_NACL)
+	rm -f *.nacl.o
 clean-pnacl:
-	rm -f $(OBJS_PNACL) *.pexe benchmarks_pnacl.nexe *.ll *-.o
+	rm -f *.bc *.pexe benchmarks_pnacl.nexe *.ll *-.o
 clean: clean-native clean-nacl
 
 

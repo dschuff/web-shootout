@@ -49,6 +49,7 @@ static int RunAll() {
     RunOne(bi, rd);
     usec_per_run = (double)rd->elapsed / (double)rd->runs;
     rd->score = 100.0 * bi->time_ref / usec_per_run;
+    ReportStatus("%s: %.2f", bi->name, rd->score);
   }
 }
 
@@ -73,7 +74,8 @@ static double GeometricMean() {
   return pow(M_E, log_total / benchmark_count);
 }
 
-int main(int argc, char *argv[]) {
+int framework_main() {
+  int score;
   memset(bench_info_list, 0, sizeof(bench_info_list));
   memset(bench_run_data, 0, sizeof(bench_run_data));
 
@@ -97,7 +99,7 @@ int main(int argc, char *argv[]) {
   printf("%d benchmarks registered\n", benchmark_count);
   RunAll();
   PrintScores();
-  printf("Aggregate score: %d\n", (int) GeometricMean());
-  return 0;
+  score = (int) GeometricMean();
+  printf("Aggregate score: %d\n", score);
+  return score;
 }
-
