@@ -53,7 +53,3 @@ function PidigitsBenchmark(n) {
   pidigits(n);
   CleanupPrint();
 }
-
-var Spectralnorm = new BenchmarkSuite('Pidigits', 1000000, [
-  new Benchmark('Pidigits', function() { PidigitsBenchmark(1000); })
-]);

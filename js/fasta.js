@@ -88,7 +88,3 @@ function FastaBenchmark(n) {
   }
   first_run = false;
 }
-
-var Fasta = new BenchmarkSuite('Fasta', 40400, [
-  new Benchmark("fasta", function() { FastaBenchmark(10000); })
-]);

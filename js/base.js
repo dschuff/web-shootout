@@ -228,6 +228,29 @@ BenchmarkSuite.prototype.RunSingleBenchmark = function(benchmark, data) {
   }
 }
 
+// Runs a single benchmark once. intended for longer-running benchmarks
+BenchmarkSuite.prototype.RunSingleLongBenchmark = function(benchmark, data) {
+  function Measure(data) {
+    var elapsed = 0;
+    var start = new Date();
+    benchmark.run();
+    elapsed = new Date() - start;
+    if (data != null) {
+      data.runs = 1;
+      data.elapsed = elapsed;
+    }
+  }
+
+  if (data == null) {
+    return { runs: 0, elapsed: 0};
+  } else {
+    Measure(data);
+    var usec = (data.elapsed * 1000);
+    print(benchmark.name + ', usec ' + data.elapsed);
+    this.NotifyStep(new BenchmarkResult(benchmark, usec));
+    return null;
+  }
+}
 
 // This function starts running a suite, but stops between each
 // individual benchmark in the suite and returns a continuation
@@ -282,4 +305,16 @@ BenchmarkSuite.prototype.RunStep = function(runner) {
 
   // Start out running the setup.
   return RunNextSetup();
+}
+
+// Instead of V8-style registration of the benchmarks in their own files,
+// do it here all together, to make changing parameters easier
+
+// Just need something to hold the BenchmarkSuite objects
+var BenchmarkList = new Array();
+
+function SetupBenchmark(name, entrypoint, param, time_ref) {
+  BenchmarkList.push(new BenchmarkSuite(name, time_ref, [
+    new Benchmark(name, function () { entrypoint(param) } )
+  ]));
 }

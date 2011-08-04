@@ -54,7 +54,7 @@ function knucleotide_main() {
   find(seq, others[i])
 }
 
-function KnucleotideBenchmark() {
+function KnucleotideBenchmark(param) {
   InitializePrint();
   InitializeReadline();
   knucleotide_main();
@@ -62,10 +62,6 @@ function KnucleotideBenchmark() {
   VerifyOutput();
   CleanupPrint();
 }
-
-var Knucleotide = new BenchmarkSuite('Knucleotide', 116000, [
-  new Benchmark('Knucleotide', function() { KnucleotideBenchmark(); })
-]);
 
 //KnucleotideBenchmark();
 //knucleotide_main();

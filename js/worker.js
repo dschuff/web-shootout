@@ -28,7 +28,7 @@ importScripts('pidigits.js');
 
 
 var completed = -1;
-var benchmarks = BenchmarkSuite.CountBenchmarks();
+var benchmarks = 0;
 var success = true;
 
 function PostTypedMessage(type, msg) {
@@ -60,8 +60,26 @@ function WWAddScore(score) {
   }
 }
 
+// This function is duplicated in run.js but it has to run after loading
+// all the individual benchmarks which is different at the CLI
+function SetupSmallBenchmarks() {
+  SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10, 500000);
+  SetupBenchmark("Fasta", FastaBenchmark, 10000, 40400);
+  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4100);
+  SetupBenchmark("BinaryTrees", BinarytreesBenchmark, 15, 294000);
+  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 116000);
+  SetupBenchmark("Nbody", NbodyBenchmark, 1000000, 730000);
+  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350, 57471);
+  SetupBenchmark("Pidigits", PidigitsBenchmark, 1000, 1000000);
+  benchmarks = BenchmarkSuite.CountBenchmarks();
+}
+
+function RunShootoutStyle() {
+  
+}
 
 function RunV8Style() {
+  SetupSmallBenchmarks();
   WWShowProgress("benchmark");
   BenchmarkSuite.RunSuites({ NotifyStep: WWShowProgress,
                              NotifyError: WWAddError,

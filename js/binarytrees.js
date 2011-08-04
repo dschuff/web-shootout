@@ -37,7 +37,7 @@ function BinarytreesBenchmark(n) {
     var longLivedTree = bottomUpTree(0,maxDepth);
     for (var depth=minDepth; depth<=maxDepth; depth+=2){
 	var iterations = 1 << (maxDepth - depth + minDepth);
-
+n
 	check = 0;
 	for (var i=1; i<=iterations; i++){
 	    check += bottomUpTree(i,depth).itemCheck();
@@ -50,7 +50,3 @@ function BinarytreesBenchmark(n) {
     //  + longLivedTree.itemCheck());
 }
 
-
-var BinaryTrees = new BenchmarkSuite('BinaryTrees', 294000, [
-  new Benchmark("binarytrees", function() { BinarytreesBenchmark(15); })
-]);

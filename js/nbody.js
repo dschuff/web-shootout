@@ -168,7 +168,3 @@ function NbodyBenchmark(n) {
   if (Math.abs(bodies.energy() - end_energy_ref) > .0000001)
       throw "End energy error";
 }
-
-var Nbody = new BenchmarkSuite('Nbody', 730000, [
-  new Benchmark('Nbody', function() { NbodyBenchmark(1000000); })
-]);

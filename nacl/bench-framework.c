@@ -39,6 +39,19 @@ static int RunOne(bench_info *bench, run_data *data) {
   return 0;
 }
 
+static int RunOneLong(bench_info *bench, run_data *data) {
+  struct timeval start, end;
+  int diff;
+  gettimeofday(&start, NULL);
+  assert(bench->run(bench->param) == 0);
+  gettimeofday(&end, NULL);
+  diff = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+  data->elapsed = diff;
+  data->runs = 1;
+  return 0;
+}
+
+
 static int RunAll() {
   int i;
   for (i = 0; i < benchmark_count; i++) {

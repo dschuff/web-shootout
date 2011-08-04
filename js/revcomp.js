@@ -61,7 +61,7 @@ function comp() {
   return complement;
 }
 
-function RevcompBenchmark() {
+function RevcompBenchmark(param) {
   InitializePrint();
   InitializeReadline();
   revcomp_main(b(comp(), print), print, readline_array);
@@ -69,9 +69,5 @@ function RevcompBenchmark() {
   CleanupReadline();
   CleanupPrint();
 }
-
-var Revcomp = new BenchmarkSuite('Revcomp', 4100, [
-  new Benchmark('Revcomp', function() { RevcompBenchmark(); })
-  ]);
 
 //RevcompBenchmark();

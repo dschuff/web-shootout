@@ -48,16 +48,12 @@ function fannkuch(n) {
 
 //n = 10, pf[0] = 73196, pf[1] = 38
 //n = 11, pf[0] = 556355, pf[1] = 51
-function runFannkuch() {
-  var pf = fannkuch(10);
-  if (pf[0] != 73196 || pf[1] != 38) {
+function FannkuchBenchmark(n) {
+  var pf = fannkuch(n);
+  if (n == 10 && (pf[0] != 73196 || pf[1] != 38)) {
       throw "Error: Pfannkuch returned " + pf[0] + ", " + pf[1];
   }
 
   //print(pf[0] + "\n" + "Pfannkuchen(" + n + ") = " + pf[1]);
 }
-
-var Fannkuchredux = new BenchmarkSuite("Fannkuchredux", 500000, [
-  new Benchmark("Fannkuchredux", runFannkuch)
-]);
 

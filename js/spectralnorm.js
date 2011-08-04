@@ -48,11 +48,8 @@ function spectralnorm(n) {
 
 //print(spectralnorm(arguments[0]).toFixed(9));
 
-function SpectralNormBenchmark() {
-    if (Math.abs(spectralnorm(350) - 1.274224047) > .0000001)
-	throw "Result error in spectralnorm";
+function SpectralnormBenchmark(param) {
+  var result = spectralnorm(param);
+  if (param == 350 && Math.abs(result - 1.274224047) > .0000001)
+    throw "Result error in spectralnorm";
 }
-
-var Spectralnorm = new BenchmarkSuite('Spectralnorm', 57471, [
-  new Benchmark('Spectralnorm', function() { SpectralNormBenchmark(); })
-]);
