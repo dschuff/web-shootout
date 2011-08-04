@@ -140,26 +140,16 @@ the <a href="http://v8.googlecode.com/svn/data/benchmarks/current/revisions.html
 
 </td><td style="text-align: center">
 <div class="run">
-  <form name="JSBenchmarkForm" action="" method="get">
-    <input type="button" value="Start JS Benchmarks" onclick="runJSBenchmarks()" />
-  </form>
   <h3>JS Status:</h3>
   <div id="status">No status</div>
+  <input type="button" value="Start JS Benchmarks" onclick="runJSBenchmarks()" />
   <div id="results">
   </div>
 </div>
 <div class="run">
   <h3>NaCl Status:</h3>
   <div id="statusField">No status</div>
-  <form name="helloForm"
-        action=""
-        method="get"
-        onsubmit="return reverseText()">
-    <input type="text" id="inputBox" name="inputBox" value="Hello world" /><p>
-    <input type="button" value="Call fortyTwo()" onclick="fortyTwo()" />
-    <input type="submit" value="Call reverseText()" />
-    <input type="button" value="Start NaCl benchmarks" onclick="runNaclBenchmarks()"/>
-  </form>
+  <input type="button" value="Start NaCl benchmarks" onclick="runNaclBenchmarks()"/>
   <!-- Load the published .nexe.  This includes the 'src' attribute which
   shows how to load multi-architecture modules.  Each entry in the "nexes"
   object in the  .nmf manifest file is a key-value pair: the key is the runtime

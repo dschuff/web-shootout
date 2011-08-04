@@ -1,6 +1,6 @@
-NACL_SDK ?= /ulg/native_client_sdk_0_5_984
+NACL_SDK_ROOT ?= /path/to/native_client_sdk
 # NACL_SVN_PATH only needed if we want to build with glibc
-NACL_SVN_PATH ?= /ulg/naclgit/native_client
+NACL_SVN_PATH ?= /path/to/native_client/svn
 CC = gcc
 CXX = g++
 BITS ?= 32
@@ -17,10 +17,19 @@ else
   PNACL_ARCH = x86
 endif
 
+OS_NAME := $(shell uname -s)
+OS_SUBDIR := UNKNOWN
+ifeq ($(OS_NAME), Darwin)
+  OS_SUBDIR := mac
+endif
+ifeq ($(OS_NAME), Linux)
+  OS_SUBDIR := linux
+endif
+
 ifeq ($(LIB),glibc)
-  NACL_CC_PATH = $(NACL_SVN_PATH)/toolchain/linux_x86/bin
+  NACL_CC_PATH = $(NACL_SVN_PATH)/toolchain/$(OS_SUBDIR)_x86/bin
 else
-  NACL_CC_PATH = $(NACL_SDK)/toolchain/linux_x86/bin
+  NACL_CC_PATH = $(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86/bin
 endif
 
 NACLCC = $(NACL_CC_PATH)/$(NACL_CC_BASE)-gcc
