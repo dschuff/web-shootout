@@ -46,10 +46,9 @@ td.contents {
 div.run {
   margin: 20px;
   width: 300px;
-  height: 300px;
+  height: 320px;
   float: right;
   background-color: rgb(229, 236, 249);
-  background-image: url(v8-logo.png);
   background-position: center center;
   background-repeat: no-repeat;
   border: 1px solid rgb(51, 102, 204);
@@ -64,9 +63,9 @@ div.warning {
   text-align: center; 
 }
 
-#status {
+div.status {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 5px;
   font-size: 120%;
   font-weight: bold;
 }

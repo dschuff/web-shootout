@@ -111,44 +111,50 @@ latest version</a>.
   <table>
     <tr>
       <td class="contents">
-This page contains a suite of pure JavaScript benchmarks that we have
-used to tune V8. The final score is computed as the geometric mean of
+This page contains a suite of benchmarks from the
+<a href="http://shootout.alioth.debian.org">Computer Language
+Shootout</a>, which has implementations of the same tasks in many
+languages. The Javascript benchmark driver is taken from the V8 project
+and the Native Client driver with the same behavior is implemented in C
+in the native client module.
+The final score is computed as the geometric mean of
 the individual results to make it independent of the running times of
 the individual benchmarks and of a reference system (score
 100). Scores are not comparable across benchmark suite versions and
 higher scores means better performance: <em>Bigger is better!</em>
 
 <ul>
-<li><b>Fannkuchredux</b><br>Pancake flipping.</li>
-<li><b>Fasta</b><br>Generate random text output.</li>
-<li><b>Revcomp</b><br>Do some stuff with text input.</li>
-<li><b>BinaryTrees</b><br>GC benchmark.</li>
-<li><b>Knucleotide</b><br>Do some other stuff with text input.</li>
-<li><b>Nbody</b><br>N-body physics simulation
-</li>
-<li><b>Spectralnorm</b><br>Can't remember, it's always so well-behaved.</li>
-<li><b>Pidigits</b><br>Calculate digits of pi</li>
+<li><b>Fannkuchredux</b><br>Indexed access to tiny integer sequence: 
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=fannkuchredux">about</a></li>
+<li><b>Fasta</b><br>Generate and write random DNA sequences: 
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=fasta">about</a></li>
+<li><b>Revcomp</b><br>Read DNA sequences - write their reverse-complement:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=revcomp">about</a></li>
+<li><b>BinaryTrees</b><br>Allocate and deallocate many many binary trees:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=binarytrees">about</a></li>
+<li><b>Knucleotide</b><br>Repeatedly update hashtables and k-nucleotide strings:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=knucleotide">about</a></li>
+<li><b>Nbody</b><br>Perform an N-body simulation of the Jovian planets:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=nbody">about</a></li>
+<li><b>Spectralnorm</b><br>Calculate an eigenvalue using the power method:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=spectralnorm">about</a></li>
+<li><b>Pidigits</b><br>Calculate the digits of Pi with streaming arbitrary-precision arithmetic:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=pidigits">about</a></li>
 </ul>
 
 <p>
-Note that benchmark results are not comparable unless both results are
-run with the same revision of the benchmark suite.  We will be making
-revisions from time to time in order to fix bugs or expand the scope
-of the benchmark suite.  For previous revisions and the change log see
-the <a href="http://v8.googlecode.com/svn/data/benchmarks/current/revisions.html">revisions</a> page.
-</p>
 
 </td><td style="text-align: center">
 <div class="run">
   <h3>JS Status:</h3>
-  <div id="status">No status</div>
+  <div id="status" class="status">Not running</div>
   <input type="button" value="Start JS Benchmarks" onclick="runJSBenchmarks()" />
   <div id="results">
   </div>
 </div>
 <div class="run">
   <h3>NaCl Status:</h3>
-  <div id="statusField">No status</div>
+  <div id="statusField" class="status">Module not loaded</div>
   <input type="button" value="Start NaCl benchmarks" onclick="runNaclBenchmarks()"/>
   <!-- Load the published .nexe.  This includes the 'src' attribute which
   shows how to load multi-architecture modules.  Each entry in the "nexes"

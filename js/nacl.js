@@ -15,6 +15,7 @@
     function handleMessage(message_event) {
       resultbox = document.getElementById('naclResults');
       resultbox.innerHTML += message_event.data + '<br>';
+      console.log("got " + message_event.data)
     }
 
     // If the page loads before the Native Client module loads, then set the

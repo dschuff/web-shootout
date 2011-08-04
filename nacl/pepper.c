@@ -234,12 +234,10 @@ void Messaging_HandleMessage(PP_Instance instance, struct PP_Var var_message) {
                      kRunBenchmarksMethodId,
                      strlen(kRunBenchmarksMethodId)) == 0) {
     var_result = CStrToVar("Starting...");
-    ppb_messaging_interface->PostMessage(instance, var_result);
-    ppb_var_interface->Release(var_result);
     fork_thread();
   }
   free(message);
-
+  
   /* Echo the return result back to browser.  Note that HandleMessage is always
    * called on the main thread, so it's OK to post the message back to the
    * browser directly from here.  This return post is asynchronous.
