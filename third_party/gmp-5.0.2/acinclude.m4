@@ -2255,6 +2255,11 @@ AC_CACHE_CHECK([how to define a 32-bit word],
     # example) for the symbol with value 0.  For now, HPUX uses .word.
     gmp_cv_asm_w32=".word"
     ;;
+  *-*-nacl*)
+    # This test seems to fail for NaCl compiler on mac.  For now, NaCl
+    # uses .long
+    gmp_cv_asm_w32=".long"
+    ;;
   *-*-*)
     gmp_tmp_val=
     for gmp_tmp_op in .long .word data4; do

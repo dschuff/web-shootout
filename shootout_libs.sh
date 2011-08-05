@@ -32,9 +32,17 @@ for arch in x86-32 x86-64; do
   done
 done
 
-# wget package
+# download package
 pushd third_party
-wget http://nacl-llvm-branches.googlecode.com/files/google-perftools-nacl-1.8.tgz
+PACKAGE=http://nacl-llvm-branches.googlecode.com/files/google-perftools-nacl-1.8.tgz
+if which wget ; then
+  wget $PACKAGE
+elif which curl ; then
+  curl -O $PACKAGE
+else
+  echo "Could not find wget or curl!"
+  return -1
+fi
 tar -xzf google-perftools-nacl-1.8.tgz
 popd
 cp third_party/build_tcmalloc_nacl.sh third_party/google-perftools
