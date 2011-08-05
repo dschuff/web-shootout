@@ -19,7 +19,7 @@ typedef struct {
   double score;   /* score for run */
 } run_data;
 
-int RegisterBenchmark(char *name, bench_function entry, int time_ref, int param);
+int RegisterBenchmark(char *name, bench_function entry, int param, int time_ref);
 
 extern const char *fasta_10k_ref_output;
 extern int fasta_10k_ref_output_len;

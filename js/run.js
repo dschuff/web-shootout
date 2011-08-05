@@ -63,14 +63,14 @@ function PrintScore(score) {
 // This function is duplicated in worker.js but it has to run after loading
 // all the individual benchmarks which is different in the browser
 function SetupSmallBenchmarks() {
-  SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10, 500000);
-  SetupBenchmark("Fasta", FastaBenchmark, 10000, 40400);
-  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4100);
-  SetupBenchmark("Binarytrees", BinarytreesBenchmark, 15, 294000);
-  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 116000);
+  SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10, 490000);
+  SetupBenchmark("Fasta", FastaBenchmark, 10000, 40779);
+  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4944);
+  SetupBenchmark("Binarytrees", BinarytreesBenchmark, 15, 285180);
+  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 113680);
   SetupBenchmark("Nbody", NbodyBenchmark, 1000000, 730000);
-  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350, 57471);
-  SetupBenchmark("Pidigits", PidigitsBenchmark, 1000, 1000000);
+  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350, 57758);
+  SetupBenchmark("Pidigits", PidigitsBenchmark, 1000, 1050000);
 }
 
 SetupSmallBenchmarks();

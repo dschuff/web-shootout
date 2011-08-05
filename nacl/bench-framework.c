@@ -13,7 +13,7 @@ static int benchmark_count = 0;
 static bench_info bench_info_list[MAX_BENCHMARKS];
 static run_data bench_run_data[MAX_BENCHMARKS];
 
-int RegisterBenchmark(char *name, bench_function entry, int time_ref, int param) {
+int RegisterBenchmark(char *name, bench_function entry, int param, int time_ref) {
   bench_info_list[benchmark_count].name = name;
   bench_info_list[benchmark_count].run = entry;
   bench_info_list[benchmark_count].time_ref = time_ref;
@@ -97,14 +97,14 @@ int framework_main() {
   assert(arrayfile_stdout);
 #endif
 
-  RegisterBenchmark(strdup("fannkuchredux"), run_fannkuch, 500000, 10);
-  RegisterBenchmark(strdup("fasta"), run_fasta, 40400, 10000);
-  RegisterBenchmark(strdup("revcomp"), run_revcomp, 4100, 0);
-  RegisterBenchmark(strdup("binarytrees"), run_binarytrees, 294000, 15);
-  RegisterBenchmark(strdup("knucleotide"), run_knucleotide, 116000, 0);
-  RegisterBenchmark(strdup("nbody"), run_nbody, 730000, 1000000);
-  RegisterBenchmark(strdup("spectralnorm"), run_spectralnorm, 57471, 350);
-  RegisterBenchmark(strdup("pidigits"), run_pidigits, 1000000, 1000);
+  RegisterBenchmark(strdup("fannkuchredux"), run_fannkuch, 10, 490000);
+  RegisterBenchmark(strdup("fasta"), run_fasta, 10000, 40779);
+  RegisterBenchmark(strdup("revcomp"), run_revcomp, 0, 4944);
+  RegisterBenchmark(strdup("binarytrees"), run_binarytrees, 15, 285180);
+  RegisterBenchmark(strdup("knucleotide"), run_knucleotide, 0, 113680);
+  RegisterBenchmark(strdup("nbody"), run_nbody, 1000000, 730000);
+  RegisterBenchmark(strdup("spectralnorm"), run_spectralnorm, 350, 57758);
+  RegisterBenchmark(strdup("pidigits"), run_pidigits, 1000, 1050000);
 
 
   fasta_10k_ref_output_len = strlen(fasta_10k_ref_output);
