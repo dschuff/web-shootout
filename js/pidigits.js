@@ -49,7 +49,7 @@ shiftLeft=functions[6];
 intValue=functions[7];
 
 function PidigitsBenchmark(n) {
-  InitializePrint();
+  InitializePrint(false);
   pidigits(n);
   CleanupPrint();
 }

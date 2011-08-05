@@ -4,8 +4,11 @@ self.addEventListener('message', function(e) {
   var msgtype = e.data.type;
   var msg = e.data.msg;
   switch (msgtype) {
-    case "start":
-      RunV8Style();
+    case "runsmall":
+      RunSmall();
+      break;
+    case "runlarge":
+      RunLarge();
       break;
     default:
       throw msg;
@@ -64,25 +67,47 @@ function WWAddScore(score) {
 // all the individual benchmarks which is different at the CLI
 function SetupSmallBenchmarks() {
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10, 490000);
-  SetupBenchmark("Fasta", FastaBenchmark, 10000, 40779);
-  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4944);
-  SetupBenchmark("BinaryTrees", BinarytreesBenchmark, 15, 285180);
-  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 113680);
   SetupBenchmark("Nbody", NbodyBenchmark, 1000000, 730000);
   SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350, 57758);
+  SetupBenchmark("Fasta", FastaBenchmark, 10000, 40779);
+  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4944);
+  SetupBenchmark("Binarytrees", BinarytreesBenchmark, 15, 285180);
+  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 113680);
   SetupBenchmark("Pidigits", PidigitsBenchmark, 1000, 1050000);
   benchmarks = BenchmarkSuite.CountBenchmarks();
+  SetRunModel("repeated");
+}
+function SetupLargeBenchmarks() {
+  SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 11, 490000);
+  SetupBenchmark("Nbody", NbodyBenchmark, 10000000, 730000);
+  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 5500, 57758);
+  SetupBenchmark("Fasta", FastaBenchmark, 3000000, 40779);
+  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4944);
+  SetupBenchmark("Binarytrees", BinarytreesBenchmark, 18, 285180);
+  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 113680);
+  SetupBenchmark("Pidigits", PidigitsBenchmark, 5000, 1050000);
+  benchmarks = BenchmarkSuite.CountBenchmarks();
+  SetRunModel("once");
 }
 
-function RunShootoutStyle() {
-  
-}
-
-function RunV8Style() {
+function RunSmall() {
   SetupSmallBenchmarks();
   WWShowProgress("benchmark");
   BenchmarkSuite.RunSuites({ NotifyStep: WWShowProgress,
                              NotifyError: WWAddError,
                              NotifyResult: WWAddResult,
+                             NotifyScore: WWAddScore });
+  ClearBenchmarks();
+  completed = -1;
+}
+
+function RunLarge() {
+  SetupLargeBenchmarks();
+  WWShowProgress("benchmark");
+  BenchmarkSuite.RunSuites({ NotifyStep: WWShowProgress,
+                             NotifyError: WWAddError,
+                             NotifyResult: WWAddResult,
                              NotifyScore: WWAddScore }); 
+  completed = -1;
+  ClearBenchmarks();
 }

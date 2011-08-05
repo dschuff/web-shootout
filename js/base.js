@@ -80,6 +80,7 @@ BenchmarkSuite.suites = [];
 // a new benchmark or change an existing one.
 BenchmarkSuite.version = '0.1';
 
+BenchmarkSuite.run_model = "repeated";
 
 // To make the benchmark results predictable, we replace Math.random
 // with a 100% deterministic alternative.
@@ -202,8 +203,15 @@ BenchmarkSuite.prototype.RunSingleBenchmark = function(benchmark, data) {
   function Measure(data) {
     var elapsed = 0;
     var start = new Date();
-    for (var n = 0; elapsed < 1000; n++) {
+    var n = 0;
+    if (BenchmarkSuite.run_model == "repeated") {
+      for (n = 0; elapsed < 1000; n++) {
+        benchmark.run();
+        elapsed = new Date() - start;
+      }
+    } else {
       benchmark.run();
+      n = 1;
       elapsed = new Date() - start;
     }
     if (data != null) {
@@ -215,38 +223,14 @@ BenchmarkSuite.prototype.RunSingleBenchmark = function(benchmark, data) {
   if (data == null) {
     // Measure the benchmark once for warm up and throw the result
     // away. Return a fresh data object.
-    Measure(null);
+    if (BenchmarkSuite.run_model == "repeated") Measure(null);
     return { runs: 0, elapsed: 0 };
   } else {
     Measure(data);
     // If we've run too few iterations, we continue for another second.
-    if (data.runs < 32) return data;
+    if (data.runs < 16 && BenchmarkSuite.run_model == "repeated") return data;
     var usec = (data.elapsed * 1000) / data.runs;
-    print(benchmark.name, 'runs ' + data.runs + ', usec ' + data.elapsed * 100 + ', usec/run ' + usec);
-    this.NotifyStep(new BenchmarkResult(benchmark, usec));
-    return null;
-  }
-}
-
-// Runs a single benchmark once. intended for longer-running benchmarks
-BenchmarkSuite.prototype.RunSingleLongBenchmark = function(benchmark, data) {
-  function Measure(data) {
-    var elapsed = 0;
-    var start = new Date();
-    benchmark.run();
-    elapsed = new Date() - start;
-    if (data != null) {
-      data.runs = 1;
-      data.elapsed = elapsed;
-    }
-  }
-
-  if (data == null) {
-    return { runs: 0, elapsed: 0};
-  } else {
-    Measure(data);
-    var usec = (data.elapsed * 1000);
-    print(benchmark.name + ', usec ' + data.elapsed);
+    print(benchmark.name, 'runs ' + data.runs + ', usec ' + data.elapsed * 1000 + ', usec/run ' + usec);
     this.NotifyStep(new BenchmarkResult(benchmark, usec));
     return null;
   }
@@ -310,11 +294,16 @@ BenchmarkSuite.prototype.RunStep = function(runner) {
 // Instead of V8-style registration of the benchmarks in their own files,
 // do it here all together, to make changing parameters easier
 
-// Just need something to hold the BenchmarkSuite objects
-var BenchmarkList = new Array();
-
 function SetupBenchmark(name, entrypoint, param, time_ref) {
-  BenchmarkList.push(new BenchmarkSuite(name, time_ref, [
+  var benchmark = new BenchmarkSuite(name, time_ref, [
     new Benchmark(name, function () { entrypoint(param) } )
-  ]));
+  ]);
+}
+
+function ClearBenchmarks() {
+  BenchmarkSuite.suites = [];
+}
+
+function SetRunModel(model) {
+  BenchmarkSuite.run_model = model;
 }

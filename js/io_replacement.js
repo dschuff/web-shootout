@@ -25,12 +25,30 @@ if (typeof print == 'undefined') {
     print = null_print;
 }
 var real_print = print;
-function fake_print(s) {
+// one fake print function keeps the output (e.g. for fasta) and the other
+// throws it away (since we run out of memory trying to keep fasta output
+// plus output of the ones that use fasta input)
+// for discard, we keep a few lines in a circular buffer to have something
+// we can log for debug purposes, and to keep the optimizer from being
+// too aggressive
+var print_keep_index = 0;
+var max_keep_lines = 100;
+
+function fake_print_keep(s) {
   print_output.push(s);
 }
-function InitializePrint() {
-  print_output = new Array();
-  print = fake_print;
+function fake_print_discard(s) {
+  print_output[print_keep_index] = s;
+  print_keep_index = (print_keep_index + 1) % max_keep_lines;
+}
+function InitializePrint(keep) {
+  if (keep) {
+    print_output = new Array();
+    print = fake_print_keep;
+  } else {
+    print_output = new Array();
+    print = fake_print_discard;
+  }
 }
 function CleanupPrint() {
   print = real_print;
@@ -38,6 +56,11 @@ function CleanupPrint() {
 function VerifyOutput(ref_input, keep_fasta_output) {
 
   var output = print_output.join("\n");
+
+  if (keep_fasta_output) {
+    fasta_output = output;
+    fasta_output_array = print_output;
+  }
 
   if(!ref_input) return;
   if(ref_input != output) {
@@ -47,10 +70,7 @@ function VerifyOutput(ref_input, keep_fasta_output) {
     real_print(output);
     throw "error";
   }
-  if (keep_fasta_output) {
-    fasta_output = output;
-    fasta_output_array = print_output;
-  }
+
   //print(output);
 }
 

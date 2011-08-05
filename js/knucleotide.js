@@ -55,7 +55,7 @@ function knucleotide_main() {
 }
 
 function KnucleotideBenchmark(param) {
-  InitializePrint();
+  InitializePrint(false);
   InitializeReadline();
   knucleotide_main();
   CleanupReadline();

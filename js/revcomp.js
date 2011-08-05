@@ -62,7 +62,7 @@ function comp() {
 }
 
 function RevcompBenchmark(param) {
-  InitializePrint();
+  InitializePrint(false);
   InitializeReadline();
   revcomp_main(b(comp(), print), print, readline_array);
   VerifyOutput();

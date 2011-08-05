@@ -23,6 +23,10 @@ function AddResult(text) {
   results.innerHTML += (text + "<br>");
 }
 
+function ClearResults() {
+  var results = document.getElementById("results");
+  results.innerHTML = "";
+}
 
 function AddError(name, error) {
   AddResult(name, '<b>error<\/b>');
@@ -92,8 +96,13 @@ worker.addEventListener('message', function(e) {
   }
 }, false);
 
-function runJSBenchmarks() {
-  worker.postMessage({'type':'start', 'msg':''}); // Start the worker.
+function runSmallJSBenchmarks() {
+  ClearResults();
+  worker.postMessage({'type':'runsmall', 'msg':''}); // Start the worker.
+}
+function runLargeJSBenchmarks() {
+  ClearResults();
+  worker.postMessage({'type':'runlarge', 'msg':''}); // Start the worker.
 }
 
 
@@ -148,7 +157,8 @@ higher scores means better performance: <em>Bigger is better!</em>
 <div class="run">
   <h3>JS Status:</h3>
   <div id="status" class="status">Not running</div>
-  <input type="button" value="Start JS Benchmarks" onclick="runJSBenchmarks()" />
+  <input type="button" value="Start Small JS Benchmarks" onclick="runSmallJSBenchmarks()" />
+  <input type="button" value="Start Large JS Benchmarks" onclick="runLargeJSBenchmarks()" />
   <div id="results">
   </div>
 </div>

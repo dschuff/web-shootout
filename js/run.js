@@ -43,7 +43,7 @@ load('pidigits.js');
 var success = true;
 
 function PrintResult(name, result) {
-  print(name + ': ' + result);
+  real_print(name + ': ' + result);
 }
 
 
@@ -64,17 +64,37 @@ function PrintScore(score) {
 // all the individual benchmarks which is different in the browser
 function SetupSmallBenchmarks() {
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10, 490000);
+  SetupBenchmark("Nbody", NbodyBenchmark, 1000000, 730000);
+  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350, 57758);
   SetupBenchmark("Fasta", FastaBenchmark, 10000, 40779);
   SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4944);
   SetupBenchmark("Binarytrees", BinarytreesBenchmark, 15, 285180);
   SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 113680);
-  SetupBenchmark("Nbody", NbodyBenchmark, 1000000, 730000);
-  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350, 57758);
   SetupBenchmark("Pidigits", PidigitsBenchmark, 1000, 1050000);
+  SetRunModel("repeated");
+}
+
+function SetupLargeBenchmarks() {
+  SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 11, 490000);
+  SetupBenchmark("Nbody", NbodyBenchmark, 10000000, 730000);
+  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 5500, 57758);
+  SetupBenchmark("Fasta", FastaBenchmark, 3000000, 40779);
+  SetupBenchmark("Revcomp", RevcompBenchmark, 0, 4944);
+  SetupBenchmark("Binarytrees", BinarytreesBenchmark, 18, 285180);
+  SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0, 113680);
+  SetupBenchmark("Pidigits", PidigitsBenchmark, 5000, 1050000);
+  SetRunModel("once");
 }
 
 SetupSmallBenchmarks();
 
+BenchmarkSuite.RunSuites({ NotifyResult: PrintResult,
+                           NotifyError: PrintError,
+                           NotifyScore: PrintScore });
+
+ClearBenchmarks();
+
+SetupLargeBenchmarks();
 BenchmarkSuite.RunSuites({ NotifyResult: PrintResult,
                            NotifyError: PrintError,
                            NotifyScore: PrintScore });

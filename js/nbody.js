@@ -161,10 +161,10 @@ function NbodyBenchmark(n) {
   ));
 
   //print(bodies.energy().toFixed(9));
-  if (Math.abs(bodies.energy() - start_energy_ref) > .0000001)
+  if (n == 350 && Math.abs(bodies.energy() - start_energy_ref) > .0000001)
       throw "Start energy error";
   for (var i=0; i<n; i++){ bodies.advance(0.01); }
   //print(bodies.energy().toFixed(9));
-  if (Math.abs(bodies.energy() - end_energy_ref) > .0000001)
+  if (n == 350 && Math.abs(bodies.energy() - end_energy_ref) > .0000001)
       throw "End energy error";
 }

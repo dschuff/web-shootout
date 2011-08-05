@@ -72,19 +72,15 @@ function fasta_main(n) {
   fastaRandom(5*n, HomoSap)
 }
 
-var first_run = true;
-
 function FastaBenchmark(n) {
-  InitializePrint();
+  InitializePrint(true);
   ResetLast();
   fasta_main(n);
   CleanupPrint();
 
-  if (first_run) {
-      if (n == 10000) VerifyOutput(fasta_ref_output, true);
-      else VerifyOutput("", true);
+  if (n == 10000) {
+    VerifyOutput(fasta_ref_output, true);
   } else {
-      VerifyOutput(fasta_ref_output, false);
+    VerifyOutput("", true);
   }
-  first_run = false;
 }
