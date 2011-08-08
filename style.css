@@ -39,7 +39,7 @@ div.subtitle {
   margin-top: 2em;
 }
 
-td.contents {
+tr.contents {
   text-align: left;
 }
 
@@ -48,6 +48,7 @@ div.run {
   width: 300px;
   height: 320px;
   float: right;
+  align: center;
   background-color: rgb(229, 236, 249);
   background-position: center center;
   background-repeat: no-repeat;

@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Script-Type" content="text/javascript">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <title>Web-shootout Benchmark Suite</title>
+<script type="text/javascript" src="js/scores.js"></script>
 <script type="text/javascript" src="js/base.js"></script>
 <script type="text/javascript" src="js/nacl.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
@@ -17,10 +18,11 @@ function ShowProgress(text) {
   status.innerHTML = text;
 }
 
-
 function AddResult(text) {
   var results = document.getElementById("results");
   results.innerHTML += (text + "<br>");
+  var nameAndScore = text.split(':');
+  registerResult(nameAndScore[0], nameAndScore[1], "js");
 }
 
 function ClearResults() {
@@ -33,14 +35,13 @@ function AddError(name, error) {
   success = false;
 }
 
-
 function AddScore(score) {
   var status = document.getElementById("status");
   if (success) {
     status.innerHTML = "Score: " + score;
   }
+  registerResult("score", score, "js");
 }
-
 
 function ShowWarningIfObsolete() {
   // If anything goes wrong we will just catch the exception and no 
@@ -119,7 +120,7 @@ latest version</a>.
   </div>
   <table>
     <tr>
-      <td class="contents">
+      <tr class="contents">
 This page contains a suite of benchmarks from the
 <a href="http://shootout.alioth.debian.org">Computer Language
 Shootout</a>, which has implementations of the same tasks in many
@@ -133,13 +134,14 @@ the individual benchmarks and of a reference system (score
 higher scores means better performance: <em>Bigger is better!</em>
 
 <ul>
+<tr/><td>
 <li><b>Fannkuchredux</b><br>Indexed access to tiny integer sequence: 
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=fannkuchredux">about</a></li>
 <li><b>Fasta</b><br>Generate and write random DNA sequences: 
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=fasta">about</a></li>
 <li><b>Revcomp</b><br>Read DNA sequences - write their reverse-complement:
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=revcomp">about</a></li>
-<li><b>BinaryTrees</b><br>Allocate and deallocate many many binary trees:
+<li><b>Binarytrees</b><br>Allocate and deallocate many many binary trees:
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=binarytrees">about</a></li>
 <li><b>Knucleotide</b><br>Repeatedly update hashtables and k-nucleotide strings:
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=knucleotide">about</a></li>
@@ -150,10 +152,18 @@ higher scores means better performance: <em>Bigger is better!</em>
 <li><b>Pidigits</b><br>Calculate the digits of Pi with streaming arbitrary-precision arithmetic:
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=pidigits">about</a></li>
 </ul>
+<td/>
 
 <p>
 
-</td><td style="text-align: center">
+<tr style="text-align: center">
+<div class="run">
+  <h3 align="center">NaCl is x times faster than JS:</h3>
+  <br />
+  <div id="comparisons" align="center">
+  </div>
+</div>
+
 <div class="run">
   <h3>JS Status:</h3>
   <div id="status" class="status">Not running</div>
@@ -190,10 +200,11 @@ higher scores means better performance: <em>Bigger is better!</em>
            src="benchmark.nmf"
            type="application/x-nacl" />
   </div>
-  <div id="naclResults">
+  <div id="naclResults" align="center">
   </div>
 </div>
-</td></tr></table>
+
+</tr></tr></table>
 
 </div>
 

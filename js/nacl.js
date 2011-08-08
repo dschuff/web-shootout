@@ -15,7 +15,14 @@
     function handleMessage(message_event) {
       resultbox = document.getElementById('naclResults');
       resultbox.innerHTML += message_event.data + '<br>';
-      console.log("got " + message_event.data)
+      console.log("got " + message_event.data);
+      if (message_event.data.search(":") != -1) {
+        var nameAndScore = message_event.data.split(':');
+        registerResult(nameAndScore[0], nameAndScore[1], "nacl");
+      } else if (message_event.data.search("score =") != -1) {
+        var split = message_event.data.split("score =");
+        registerResult("score", split[1], "nacl");
+      }
     }
 
     // If the page loads before the Native Client module loads, then set the
