@@ -10,6 +10,7 @@
 /* Minimum benchmark runtime in us */
 static const int kMinBenchRuntime = 1000000;
 static int benchmark_count = 0;
+static int started = 0;
 static bench_info bench_info_list[MAX_BENCHMARKS];
 static run_data bench_run_data[MAX_BENCHMARKS];
 
@@ -79,11 +80,14 @@ static int RunAll() {
     bench_info *bi = &bench_info_list[i];
     double usec_per_run;
     printf("Running %s\n", bi->name);
+    ++started;
+    ReportStatus("Running %s (%d/%d)\n", bi->name, started, benchmark_count);
     RunOne(bi, rd);
     usec_per_run = (double)rd->elapsed / (double)rd->runs;
     rd->score = 100.0 * bi->time_ref / usec_per_run;
     ReportStatus("%s: %.2f", bi->name, rd->score);
   }
+  started = 0;
 }
 
 static int PrintScores() {

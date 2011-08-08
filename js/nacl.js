@@ -11,17 +11,23 @@
       updateStatus('Module Loaded');
     }
 
+    function updateResultBox(message_event) {
+      resultbox = document.getElementById('NaclResults');
+      resultbox.innerHTML += message_event.data + '<br>';
+    }
+
     // Handle a message coming from the NaCl module.
     function handleMessage(message_event) {
-      resultbox = document.getElementById('naclResults');
-      resultbox.innerHTML += message_event.data + '<br>';
       console.log("got " + message_event.data);
       if (message_event.data.search(":") != -1) {
+        updateResultBox(message_event);
         var nameAndScore = message_event.data.split(':');
+        if (nameAndScore[0] == "Score") {
+          updateStatus(message_event.data);
+      }
         registerResult(nameAndScore[0], nameAndScore[1], "nacl");
-      } else if (message_event.data.search("score =") != -1) {
-        var split = message_event.data.split("score =");
-        registerResult("score", split[1], "nacl");
+      } else {
+        updateStatus(message_event.data);
       }
     }
 
@@ -29,10 +35,6 @@
     // status message indicating that the module is still loading.  Otherwise,
     // do not change the status message.
     function pageDidLoad() {
-      // Set the focus on the text input box.  Doing this means you can press
-      // return as soon as the page loads, and it will fire the reversetText()
-      // function.
-      document.forms.helloForm.inputBox.focus();
       if (helloWorldModule == null) {
         updateStatus('LOADING...');
       } else {
@@ -48,10 +50,20 @@
       helloWorldModule.postMessage('fortyTwo');
     }
 
+function ClearNaclResults() {
+  var results = document.getElementById("NaclResults");
+  // Only clear after we have completed a run
+  if (results.innerHTML.search("Score:") != -1) {
+    results.innerHTML = "";
+  }
+}
+
 function runSmallNaclBenchmarks() {
+    ClearNaclResults();
     helloWorldModule.postMessage('runBenchmarks small');
 }
 function runLargeNaclBenchmarks() {
+    ClearNaclResults();
     helloWorldModule.postMessage('runBenchmarks large');
 }
 
@@ -64,16 +76,16 @@ function runLargeNaclBenchmarks() {
       return false;
     }
 
-    // Set the global status message.  If the element with id 'statusField'
+    // Set the global status message.  If the element with id 'NaclStatus'
     // exists, then set its HTML to the status message as well.
     // opt_message The message test.  If this is null or undefined, then
-    //     attempt to set the element with id 'statusField' to the value of
+    //     attempt to set the element with id 'NaclStatus' to the value of
     //     |statusText|.
     function updateStatus(opt_message) {
       if (opt_message)
         statusText = opt_message;
-      var statusField = document.getElementById('statusField');
-      if (statusField) {
-        statusField.innerHTML = statusText;
+      var NaclStatus = document.getElementById('NaclStatus');
+      if (NaclStatus) {
+        NaclStatus.innerHTML = statusText;
       }
     }

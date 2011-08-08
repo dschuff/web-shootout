@@ -29,8 +29,7 @@ importScripts('nbody.js');
 importScripts('spectralnorm.js');
 importScripts('pidigits.js');
 
-
-var completed = -1;
+var started = 0;
 var benchmarks = 0;
 var success = true;
 
@@ -39,11 +38,13 @@ function PostTypedMessage(type, msg) {
 }
 
 function WWShowProgress(name) {
-  var percentage = ((++completed) / benchmarks) * 100;
-  var message = "Running, " + Math.round(percentage) + "% completed";
-  PostTypedMessage('status', message);
 }
 
+function WWAddStart(name) {
+  ++started;
+  var message = "Running " + name + " (" + started + "/" + benchmarks + ")";
+  PostTypedMessage('status', message);
+}
 
 function WWAddResult(name, result) {
   var text = name + ': ' + result;
@@ -59,7 +60,7 @@ function WWAddError(name, error) {
 
 function WWAddScore(score) {
   if (success) {
-      PostTypedMessage('score', score);
+    PostTypedMessage('score', score);
   }
 }
 
@@ -94,20 +95,22 @@ function RunSmall() {
   SetupSmallBenchmarks();
   WWShowProgress("benchmark");
   BenchmarkSuite.RunSuites({ NotifyStep: WWShowProgress,
+                             NotifyStart: WWAddStart,
                              NotifyError: WWAddError,
                              NotifyResult: WWAddResult,
                              NotifyScore: WWAddScore });
   ClearBenchmarks();
-  completed = -1;
+  started = 0;
 }
 
 function RunLarge() {
   SetupLargeBenchmarks();
   WWShowProgress("benchmark");
   BenchmarkSuite.RunSuites({ NotifyStep: WWShowProgress,
+                             NotifyStart: WWAddStart,
                              NotifyError: WWAddError,
                              NotifyResult: WWAddResult,
                              NotifyScore: WWAddScore }); 
-  completed = -1;
+  started = 0;
   ClearBenchmarks();
 }

@@ -300,7 +300,7 @@ void *bench_thread(void *p) {
                ti->bench_size == kBenchmarkSmall ? "small" : "large");
 
   int score = framework_main(ti->bench_size);
-  ReportStatus("Done, score = %d", score);
+  ReportStatus("Score: %d", score);
   pthread_mutex_unlock(&run_mutex);
   // these threads never get joined, so free our thread info
   free(ti);

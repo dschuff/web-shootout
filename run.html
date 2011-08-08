@@ -6,28 +6,31 @@
 <meta http-equiv="Content-Script-Type" content="text/javascript">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <title>Web-shootout Benchmark Suite</title>
-<script type="text/javascript" src="js/scores.js"></script>
 <script type="text/javascript" src="js/base.js"></script>
+<script type="text/javascript" src="js/scores.js"></script>
 <script type="text/javascript" src="js/nacl.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript">
 var success = true;
 
 function ShowProgress(text) {
-  var status = document.getElementById("status");
-  status.innerHTML = text;
+  var JsStatus = document.getElementById("JsStatus");
+  JsStatus.innerHTML = text;
 }
 
 function AddResult(text) {
-  var results = document.getElementById("results");
+  var results = document.getElementById("JsResults");
   results.innerHTML += (text + "<br>");
   var nameAndScore = text.split(':');
   registerResult(nameAndScore[0], nameAndScore[1], "js");
 }
 
-function ClearResults() {
-  var results = document.getElementById("results");
-  results.innerHTML = "";
+function ClearJsResults() {
+  var results = document.getElementById("JsResults");
+  // Only clear after we have completed a run
+  if (results.innerHTML.search("Score:") != -1) {
+    results.innerHTML = "<br />";
+  }
 }
 
 function AddError(name, error) {
@@ -36,11 +39,11 @@ function AddError(name, error) {
 }
 
 function AddScore(score) {
-  var status = document.getElementById("status");
+  var JsStatus = document.getElementById("JsStatus");
   if (success) {
-    status.innerHTML = "Score: " + score;
+    JsStatus.innerHTML = "Score: " + score;
   }
-  registerResult("score", score, "js");
+  registerResult("Score", score, "js");
 }
 
 function ShowWarningIfObsolete() {
@@ -98,11 +101,11 @@ worker.addEventListener('message', function(e) {
 }, false);
 
 function runSmallJSBenchmarks() {
-  ClearResults();
+  ClearJsResults();
   worker.postMessage({'type':'runsmall', 'msg':''}); // Start the worker.
 }
 function runLargeJSBenchmarks() {
-  ClearResults();
+  ClearJsResults();
   worker.postMessage({'type':'runlarge', 'msg':''}); // Start the worker.
 }
 
@@ -166,15 +169,15 @@ higher scores means better performance: <em>Bigger is better!</em>
 
 <div class="run">
   <h3>JS Status:</h3>
-  <div id="status" class="status">Not running</div>
+  <div id="JsStatus" class="status">Not running</div>
   <input type="button" value="Start Small JS Benchmarks" onclick="runSmallJSBenchmarks()" />
   <input type="button" value="Start Large JS Benchmarks" onclick="runLargeJSBenchmarks()" />
-  <div id="results">
+  <div id="JsResults" align="center"><br />
   </div>
 </div>
 <div class="run">
   <h3>NaCl Status:</h3>
-  <div id="statusField" class="status">Module not loaded</div>
+  <div id="NaclStatus" class="status">Module not loaded</div>
   <input type="button" value="Start Small NaCl benchmarks" onclick="runSmallNaclBenchmarks()"/>
   <input type="button" value="Start Large NaCl benchmarks" onclick="runLargeNaclBenchmarks()"/>
   <!-- Load the published .nexe.  This includes the 'src' attribute which
@@ -201,7 +204,7 @@ higher scores means better performance: <em>Bigger is better!</em>
            src="benchmark.nmf"
            type="application/x-nacl" />
   </div>
-  <div id="naclResults" align="center">
+  <div id="NaclResults" align="center">
   </div>
 </div>
 
