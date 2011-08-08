@@ -161,13 +161,15 @@ int nbody(int steps)
   memcpy(bodies, bodies_init, sizeof(bodies));
   offset_momentum();
 
+  // To verify output at the command line for step counts other than the
+  // defaults, uncomment the printfs
   //printf ("%.9f\n", energy());
   if (fabs(energy() - start_energy_ref) > .0000001) return 1;
 
   advance(steps);
 
   //printf ("%.9f\n", energy());
-  if (fabs(energy() - end_energy_ref) > .0000001) return 1;
+  if (steps == 1000000 && fabs(energy() - end_energy_ref) > .0000001) return 1;
   return 0;
 }
 

@@ -39,7 +39,7 @@
 #endif //__GLIBC__
 #endif //!ARRAYFILE
 
-char *fasta_output;
+char *fasta_output = NULL;
 int fasta_output_len;
 
 typedef unsigned random_t;
@@ -199,7 +199,9 @@ fasta_bench(int n) {
 }
 
 int run_fasta(int n) {
-  static int run = 0;
+#ifdef ARRAYFILE
+  arrayfile_set_keep_output(arrayfile_stdout, 1);
+#endif
 
   fasta_bench(n);
 #ifdef ARRAYFILE
@@ -213,12 +215,10 @@ int run_fasta(int n) {
   } else {
     ret = 0;
   }
-  if (run == 0) {
-    fasta_output = output;
-    fasta_output_len = output_len;
-  } else {
-    free(output);
-  }
+  if (fasta_output) free(fasta_output);
+  fasta_output = output;
+  fasta_output_len = output_len;
+
   return ret;
 #endif
   return 0;

@@ -13,6 +13,9 @@ static int benchmark_count = 0;
 static bench_info bench_info_list[MAX_BENCHMARKS];
 static run_data bench_run_data[MAX_BENCHMARKS];
 
+enum run_model_t { kRunModelRepeated, kRunModelOnce };
+static enum run_model_t run_model;
+
 int RegisterBenchmark(char *name, bench_function entry, int param, int time_ref) {
   bench_info_list[benchmark_count].name = name;
   bench_info_list[benchmark_count].run = entry;
@@ -21,20 +24,37 @@ int RegisterBenchmark(char *name, bench_function entry, int param, int time_ref)
   benchmark_count++;
 }
 
+void ClearBenchmarks() {
+  for (int i = 0; i < benchmark_count; i++) free(bench_info_list[i].name);
+  benchmark_count = 0;
+}
+
 static int RunOne(bench_info *bench, run_data *data) {
   int runs;
   struct timeval start, end;
   int diff;
-  /* run one iteration to warm up the cache (if v8 can JIT off the clock,
-     then we can do this) */
-  bench->run(bench->param);
+  if (run_model == kRunModelRepeated) {
+    /* run one iteration to warm up the cache (if v8 can JIT off the clock,
+       then we can do this) */
+    bench->run(bench->param);
+  }
   gettimeofday(&start, NULL);
-  for (data->runs = 0; data->elapsed < kMinBenchRuntime || data->runs < 32;
-       data->runs++) {
+  if (run_model == kRunModelRepeated) {
+    for (data->runs = 0; data->elapsed < kMinBenchRuntime || data->runs < 16;
+         data->runs++) {
+      assert(bench->run(bench->param) == 0);
+      gettimeofday(&end, NULL);
+      diff = (end.tv_sec - start.tv_sec) * 1000000 + 
+        (end.tv_usec - start.tv_usec);
+      data->elapsed = diff;
+    }
+  } else {
     assert(bench->run(bench->param) == 0);
     gettimeofday(&end, NULL);
-    diff = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+    diff = (end.tv_sec - start.tv_sec) * 1000000 + 
+      (end.tv_usec - start.tv_usec);
     data->elapsed = diff;
+    data->runs = 1;
   }
   return 0;
 }
@@ -87,7 +107,33 @@ static double GeometricMean() {
   return pow(M_E, log_total / benchmark_count);
 }
 
-int framework_main() {
+void SetupSmallBenchmarks() {
+  RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 10, 490000);
+  RegisterBenchmark(strdup("Nbody"), run_nbody, 1000000, 730000);
+  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 57758);
+  RegisterBenchmark(strdup("Fasta"), run_fasta, 10000, 40779);
+  RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 4944);
+  RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 15, 285180);
+  RegisterBenchmark(strdup("Knucleotide"), run_knucleotide, 0, 113680);
+  RegisterBenchmark(strdup("Pidigits"), run_pidigits, 1000, 1050000);
+  run_model = kRunModelRepeated;
+}
+
+void SetupLargeBenchmarks() {
+  RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 11, 490000);
+  RegisterBenchmark(strdup("Nbody"), run_nbody, 10000000, 730000);
+  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 57758);
+  RegisterBenchmark(strdup("Fasta"), run_fasta, 3000000, 40779);
+  RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 4944);
+  RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 18, 285180);
+  RegisterBenchmark(strdup("Knucleotide"), run_knucleotide, 0, 113680);
+  RegisterBenchmark(strdup("Pidigits"), run_pidigits, 5000, 1050000);
+  run_model = kRunModelOnce;
+}
+
+
+/* must be protected with a mutex */
+int framework_main(enum benchmark_size_t size) {
   int score;
   memset(bench_info_list, 0, sizeof(bench_info_list));
   memset(bench_run_data, 0, sizeof(bench_run_data));
@@ -97,15 +143,11 @@ int framework_main() {
   assert(arrayfile_stdout);
 #endif
 
-  RegisterBenchmark(strdup("fannkuchredux"), run_fannkuch, 10, 490000);
-  RegisterBenchmark(strdup("fasta"), run_fasta, 10000, 40779);
-  RegisterBenchmark(strdup("revcomp"), run_revcomp, 0, 4944);
-  RegisterBenchmark(strdup("binarytrees"), run_binarytrees, 15, 285180);
-  RegisterBenchmark(strdup("knucleotide"), run_knucleotide, 0, 113680);
-  RegisterBenchmark(strdup("nbody"), run_nbody, 1000000, 730000);
-  RegisterBenchmark(strdup("spectralnorm"), run_spectralnorm, 350, 57758);
-  RegisterBenchmark(strdup("pidigits"), run_pidigits, 1000, 1050000);
-
+  if (size == kBenchmarkSmall) {
+    SetupSmallBenchmarks();
+  } else {
+    SetupLargeBenchmarks();
+  }
 
   fasta_10k_ref_output_len = strlen(fasta_10k_ref_output);
 
@@ -113,6 +155,11 @@ int framework_main() {
   RunAll();
   PrintScores();
   score = (int) GeometricMean();
+#ifdef ARRAYFILE
+  arrayfile_fclose(arrayfile_stdout);
+  arrayfile_stdout = NULL;
+#endif
+  ClearBenchmarks();
   printf("Aggregate score: %d\n", score);
   return score;
 }

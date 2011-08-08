@@ -121,8 +121,8 @@ int binarytrees(int depth_arg)
     return 0;
 }
 
-extern "C" {
+extern "C"
 int run_binarytrees(int n) {
   return binarytrees(n);
 }
-}
+

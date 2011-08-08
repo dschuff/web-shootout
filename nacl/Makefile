@@ -63,17 +63,20 @@ all: native nacl
 	pnacl-gcc -c $(CFLAGS) $< -o $@
 
 native: $(OBJS_NATIVE) cli.native.o
-	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) -o benchmarks$(BITS) $(LIBS) -lgmp
+	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) cli.native.o -o \
+	  benchmarks$(BITS) $(LIBS) -lgmp
 
 nacl: benchmarks$(BITS).nexe benchmarks_browser$(BITS).nexe
 pepper: benchmarks_browser$(BITS).nexe
 
 benchmarks$(BITS).nexe: $(OBJS_NACL) cli.nacl.o
 #	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) -lgmp $(LIBS)
-	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) $(LIBS) -lgmp -ltcmalloc_minimal -lpthread
+	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) $(LIBS) \
+          -lgmp -ltcmalloc_minimal -lpthread
 
 benchmarks_browser$(BITS).nexe: $(OBJS_NACL) pepper.nacl.o
-	$(NACLCXX) $(OBJS_NACL)  pepper.nacl.o -o $@ -L$(LIBDIR) $(LIBS) -lppapi -lgmp -ltcmalloc_minimal -lpthread
+	$(NACLCXX) $(OBJS_NACL)  pepper.nacl.o -o $@ -L$(LIBDIR) $(LIBS) \
+          -lppapi -lgmp -ltcmalloc_minimal -lpthread
 	chmod a+r *.nexe
 
 pnacl: $(OBJS_PNACL) cli.bc

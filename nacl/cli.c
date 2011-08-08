@@ -5,7 +5,8 @@
 #include "bench-framework.h"
 
 int main(int argc, char **argv) {
-  framework_main();
+  framework_main(kBenchmarkSmall);
+  framework_main(kBenchmarkLarge);
 }
 
 void ReportStatus(const char *format, ...) {
@@ -13,4 +14,5 @@ void ReportStatus(const char *format, ...) {
   va_start(ap, format);
   vprintf(format, ap);
   va_end(ap);
+  printf("\n");
 }

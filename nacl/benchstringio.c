@@ -280,6 +280,7 @@ struct arrayfile_struct {
   char **array;
   int *array_allocs;
   int array_size;
+  int keep_output;
 };
 
 arrayfile_t * arrayfile_fopen(const char *name, const char *mode) {
@@ -288,8 +289,17 @@ arrayfile_t * arrayfile_fopen(const char *name, const char *mode) {
   if (!file) return NULL;
 
   if (mode && mode[0] != 'w') {
-    printf("bad mode in arrayfile_open\n");
+    printf("bad mode %s in arrayfile_open\n", mode);
     goto array_fail;
+  }
+  file->keep_output = 1;
+  if (mode && strlen(mode) > 1) {
+    if (mode[1] == 'd') {
+      file->keep_output = 0;
+    } else {
+      printf("bad mode %s in arrayfile_open\n", mode);
+      goto array_fail;
+    }
   }
 
   file->array = (char **)calloc(kArrayfileDefaultAlloc, sizeof(void *));
@@ -312,6 +322,10 @@ arrayfile_t * arrayfile_fopen(const char *name, const char *mode) {
   return NULL;
 }
 
+void arrayfile_set_keep_output(arrayfile_t *file, int keep) {
+  file->keep_output = keep;
+}
+
 ssize_t arrayfile_fwrite(const char *b, size_t s, size_t n, arrayfile_t *file) {
   char *buf;
   size_t size = s * n;
@@ -320,13 +334,24 @@ ssize_t arrayfile_fwrite(const char *b, size_t s, size_t n, arrayfile_t *file) {
   if (!file->array) return 0;
   count = file->array_count;
   assert(count <= file->array_size);
-  if (count == file->array_size) { /* grow the capacity */
-    file->array = realloc(file->array, file->array_size * sizeof(void *) * 2);
-    if (!file->array) return 0;
-    file->array_lens = realloc(file->array_lens, file->array_size * sizeof(int) * 2);
-    file->array_allocs = realloc(file->array_allocs, file->array_size * sizeof(int) * 2);
-    if (!file->array_lens || !file->array_allocs) return 0;
-    file->array_size = file->array_size * 2;
+  if (count == file->array_size) {
+    if (file->keep_output) {
+      /* grow the capacity */
+      file->array = realloc(file->array, file->array_size * sizeof(void *) * 2);
+      if (!file->array) return 0;
+      file->array_lens = realloc(file->array_lens, 
+                                 file->array_size * sizeof(int) * 2);
+      file->array_allocs = realloc(file->array_allocs,
+                                   file->array_size * sizeof(int) * 2);
+      if (!file->array_lens || !file->array_allocs) return 0;
+      // initialize the newly-allocated upper halves
+      memset(file->array + count, 0, count * sizeof(void *));
+      memset(file->array_lens + count, 0, count * sizeof(int));
+      memset(file->array_allocs + count, 0, count * sizeof(int));
+      file->array_size = file->array_size * 2;
+    }
+    else {
+    }
   }
 
   /* Reuse existing string buffer if possible*/
@@ -385,7 +410,6 @@ char * arrayfile_join(arrayfile_t *file, int *len) {
   joinbuf = malloc(total_size + 1);
   if (!joinbuf) return NULL;
   for (i = 0; i < file->array_count; i++) {
-    //assert(strlen(file->array[i]) == file->array_lens[i]);
     memcpy(joinbuf + pos, file->array[i], file->array_lens[i]);
     pos += file->array_lens[i];
   }
@@ -404,7 +428,9 @@ int arrayfile_fclose(arrayfile_t *file) {
   if (!file) return EOF;
   for (i = 0; i < file->array_size; i++) {
     free(file->array[i]);
+    file->array[i] = NULL;
   }
+  free(file->array);
   free(file->array_lens);
   free(file->array_allocs);
   free(file);

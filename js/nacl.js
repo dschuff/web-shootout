@@ -48,8 +48,11 @@
       helloWorldModule.postMessage('fortyTwo');
     }
 
-function runNaclBenchmarks() {
-    helloWorldModule.postMessage('runBenchmarks');
+function runSmallNaclBenchmarks() {
+    helloWorldModule.postMessage('runBenchmarks small');
+}
+function runLargeNaclBenchmarks() {
+    helloWorldModule.postMessage('runBenchmarks large');
 }
 
     function reverseText() {

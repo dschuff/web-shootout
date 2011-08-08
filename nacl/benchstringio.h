@@ -19,6 +19,7 @@ char *stringfile_fgets(char *s, int size, void *cookie);
 to match JS behavior */
 typedef struct arrayfile_struct arrayfile_t;
 arrayfile_t * arrayfile_fopen(const char *name, const char *mode);
+void arrayfile_set_keep_output(arrayfile_t *file, int keep);
 ssize_t arrayfile_fwrite(const char *b, size_t s, size_t n, arrayfile_t *file);
 char * arrayfile_join(arrayfile_t *file, int *len);
 int arrayfile_fputc(int c, arrayfile_t *file);

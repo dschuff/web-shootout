@@ -36,7 +36,9 @@ int run_nbody(int p);
 int run_pidigits(int p);
 int run_spectralnorm(int p);
 
-int framework_main();
+enum benchmark_size_t { kBenchmarkSmall, kBenchmarkLarge };
+
+int framework_main(enum benchmark_size_t size);
 void ReportStatus(const char *format, ...);
 
 //#define memcpy(d, s, n)    __builtin_memcpy ((d), (s), (n))

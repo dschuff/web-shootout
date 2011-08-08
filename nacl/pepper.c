@@ -43,7 +43,8 @@ static PP_Instance my_instance;
 
 void SendStringMessage(const char *format, ...);
 void ReportStatus(const char *format, ...);
-int fork_thread();
+int fork_thread(enum benchmark_size_t);
+pthread_mutex_t run_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
  * Returns a mutable C string contained in the @a var or NULL if @a var is not
@@ -234,7 +235,13 @@ void Messaging_HandleMessage(PP_Instance instance, struct PP_Var var_message) {
                      kRunBenchmarksMethodId,
                      strlen(kRunBenchmarksMethodId)) == 0) {
     var_result = CStrToVar("Starting...");
-    fork_thread();
+    enum benchmark_size_t bench_size = kBenchmarkSmall;
+    if (strncmp(message + strlen(kRunBenchmarksMethodId) + 1,
+                "large",
+                strlen("large")) == 0) {
+      bench_size = kBenchmarkLarge;
+    }
+    fork_thread(bench_size);
   }
   free(message);
   
@@ -326,22 +333,33 @@ void SendStringMessageOnMainThread(char *str) {
   ppb_core_interface->CallOnMainThread(0, cb, 0);
 }
 
-void *bench_thread(void *p) {
-  ReportStatus("Started benchmark thread...");
+typedef struct thread_info {
+  enum benchmark_size_t bench_size;
+} thread_info_t;
 
-  int score = framework_main();
-  //    char resultstr[32];
-  //    snprintf(resultstr, 32, "Finished. Score = %d", score);
-  //    var_result = CStrToVar(resultstr);
-  //    ppb_messaging_interface->PostMessage(instance, var_result);
-  //ppb_var_interface->Release(var_result);
+void *bench_thread(void *p) {
+  if(pthread_mutex_trylock(&run_mutex) != 0) {
+    ReportStatus("Benchmarks already running");
+    return NULL;
+  }
+  thread_info_t *ti = (thread_info_t *)p;
+  ReportStatus("Started %s benchmark thread...", 
+               ti->bench_size == kBenchmarkSmall ? "small" : "large");
+
+  int score = framework_main(ti->bench_size);
   ReportStatus("Done, score = %d", score);
+  pthread_mutex_unlock(&run_mutex);
+  // these threads never get joined, so free our thread info
+  free(ti);
+  return NULL;
 }
 
-int fork_thread() {
+int fork_thread(enum benchmark_size_t size) {
   pthread_t th;
   int er;
-  if(er = pthread_create(&th, NULL, bench_thread, NULL)) {
+  thread_info_t *ti = malloc(sizeof(thread_info_t));
+  ti->bench_size = size;
+  if(er = pthread_create(&th, NULL, bench_thread, ti)) {
     ReportStatus("pthread_create failed! retval %d, %s", er, strerror(er));
     abort();
   }

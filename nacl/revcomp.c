@@ -319,14 +319,16 @@ int run_revcomp(int ignored) {
   stringfile_stdin = stringfile_open((void *)fasta_output, fasta_output_len, "r");
   if (!stringfile_stdin) return -1;
   assert(arrayfile_stdout);
+  arrayfile_set_keep_output(arrayfile_stdout, 0);
 #endif
 
   revcomp_main();
 
 #ifdef ARRAYFILE
   char *output = arrayfile_join(arrayfile_stdout, NULL);
+  arrayfile_rewind(arrayfile_stdout);
+  // To verify revcomp output at the command line, uncomment this
   //if (run++ == 0) fwrite(output, 1, strlen(output), stdout);
-  // verify revcomp output too?
   free(output);
   stringfile_close(stringfile_stdin);
   return 0;
