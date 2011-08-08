@@ -27,8 +27,6 @@ struct MessageInfo {
   struct PP_Var message;
 };
 
-static const char* const kReverseTextMethodId = "reverseText";
-static const char* const kFortyTwoMethodId = "fortyTwo";
 static const char* const kRunBenchmarksMethodId = "runBenchmarks";
 static const char kMessageArgumentSeparator = ':';
 static const char kNullTerminator = '\0';
@@ -42,6 +40,7 @@ static PP_Module module_id = 0;
 static PP_Instance my_instance;
 
 void SendStringMessage(const char *format, ...);
+void SendStringMessageOnMainThread(char *str);
 void ReportStatus(const char *format, ...);
 int fork_thread(enum benchmark_size_t);
 pthread_mutex_t run_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -84,27 +83,6 @@ static struct PP_Var CStrToVar(const char* str) {
   return PP_MakeUndefined();
 }
 
-/**
- * Reverse C string in-place.
- * @param[in,out] str C string to be reversed
- */
-static void ReverseStr(char* str) {
-  char* right = str + strlen(str) - 1;
-  char* left = str;
-  while (left < right) {
-    char tmp = *left;
-    *left++ = *right;
-    *right-- = tmp;
-  }
-}
-
-/**
- * A simple function that always returns 42.
- * @return always returns the integer 42
- */
-static struct PP_Var FortyTwo() {
-  return PP_MakeInt32(42);
-}
 
 /**
  * Called when the NaCl module is instantiated on the web page. The identifier
@@ -203,9 +181,7 @@ static PP_Bool Instance_HandleDocumentLoad(PP_Instance instance,
 /**
  * Handler for messages coming in from the browser via postMessage.  Extracts
  * the method call from @a message, parses it for method name and value, then
- * calls the appropriate function.  In the case of the reverseString method, the
- * message format is a simple colon-separated string.  The first part of the
- * string up to the colon is the method name; after that is the string argument.
+ * calls the appropriate function.v
  * @param[in] instance The instance ID.
  * @param[in] message The contents, copied by value, of the message sent from
  *     browser via postMessage.
@@ -218,45 +194,22 @@ void Messaging_HandleMessage(PP_Instance instance, struct PP_Var var_message) {
   char* message = VarToCStr(var_message);
   if (message == NULL)
     return;
-  struct PP_Var var_result = PP_MakeUndefined();
-  if (strncmp(message, kFortyTwoMethodId, strlen(kFortyTwoMethodId)) == 0) {
-    var_result = FortyTwo();
-  } else if (strncmp(message,
-                     kReverseTextMethodId,
-                     strlen(kReverseTextMethodId)) == 0) {
-    /* Use everything after the ':' in |message| as the string argument. */
-    char* string_arg = strchr(message, kMessageArgumentSeparator);
-    if (string_arg != NULL) {
-      string_arg += 1;  /* Advance past the ':' separator. */
-      ReverseStr(string_arg);
-      var_result = CStrToVar(string_arg);
-    }
-  } else if (strncmp(message, 
-                     kRunBenchmarksMethodId,
-                     strlen(kRunBenchmarksMethodId)) == 0) {
-    var_result = CStrToVar("Starting...");
+ if (strncmp(message, 
+             kRunBenchmarksMethodId,
+             strlen(kRunBenchmarksMethodId)) == 0) {
     enum benchmark_size_t bench_size = kBenchmarkSmall;
     if (strncmp(message + strlen(kRunBenchmarksMethodId) + 1,
                 "large",
                 strlen("large")) == 0) {
       bench_size = kBenchmarkLarge;
     }
+    /* Use SendStringMessageOnMainThread here instead of ReportResult
+       to work around crash bug (we have to use CallOnMainThread from the
+       main thread before using it on a background thread */
+    SendStringMessageOnMainThread(strdup("Starting..."));
     fork_thread(bench_size);
   }
   free(message);
-  
-  /* Echo the return result back to browser.  Note that HandleMessage is always
-   * called on the main thread, so it's OK to post the message back to the
-   * browser directly from here.  This return post is asynchronous.
-   */
-  ppb_messaging_interface->PostMessage(instance, var_result);
-  /* If the message was created using VarFromUtf8() it needs to be released.
-   * See the comments about VarFromUtf8() in ppapi/c/ppb_var.h for more
-   * information.
-   */
-  if (var_result.type == PP_VARTYPE_STRING) {
-    ppb_var_interface->Release(var_result);
-  }
 }
 
 /**
