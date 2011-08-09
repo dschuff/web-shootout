@@ -19,13 +19,9 @@
     // Handle a message coming from the NaCl module.
     function handleMessage(message_event) {
       console.log("got " + message_event.data);
-      if (message_event.data.search(":") != -1) {
-        updateResultBox(message_event);
-        var nameAndScore = message_event.data.split(':');
-        if (nameAndScore[0] == "Score") {
-          updateStatus(message_event.data);
-      }
-        registerResult(nameAndScore[0], nameAndScore[1], "nacl");
+      if (message_event.data.search(":") != -1 &&
+          message_event.data.search("Score") == -1) {
+          updateResultBox(message_event);
       } else {
         updateStatus(message_event.data);
       }

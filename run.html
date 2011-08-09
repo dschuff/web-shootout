@@ -7,11 +7,11 @@
 <meta http-equiv="Content-Style-Type" content="text/css">
 <title>Web-shootout Benchmark Suite</title>
 <script type="text/javascript" src="js/base.js"></script>
-<script type="text/javascript" src="js/scores.js"></script>
 <script type="text/javascript" src="js/nacl.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript">
 var success = true;
+browserAndVersionOK = false;
 
 function ShowProgress(text) {
   var JsStatus = document.getElementById("JsStatus");
@@ -22,7 +22,6 @@ function AddResult(text) {
   var results = document.getElementById("JsResults");
   results.innerHTML += (text + "<br>");
   var nameAndScore = text.split(':');
-  registerResult(nameAndScore[0], nameAndScore[1], "js");
 }
 
 function ClearJsResults() {
@@ -43,7 +42,6 @@ function AddScore(score) {
   if (success) {
     JsStatus.innerHTML = "Score: " + score;
   }
-  registerResult("Score", score, "js");
 }
 
 function ShowWarningIfObsolete() {
@@ -71,10 +69,29 @@ function ShowWarningIfObsolete() {
   }
 }
 
+function ChromeVersion() {
+  try {
+    return parseFloat(navigator.userAgent.match(/Chrome\/(\d+\.\d+)/)[1]) || undefined;
+  } catch(e) {}
+  return undefined;
+}
+
 function Load() {
   var version = BenchmarkSuite.version;
   document.getElementById("version").innerHTML = version;
-  ShowWarningIfObsolete();  
+  ShowWarningIfObsolete();
+  // Check if the version of Chrome is OK
+  chromeVersion = ChromeVersion();
+  if (!chromeVersion || chromeVersion < 14) {
+    var browser = document.getElementById("badBrowserOrVersion");
+    var warning = "<br/>";
+    warning += "These benchmarks require Google Chrome Beta channel (Chrome 14) <br/>";
+    warning += "Please download the Google Chrome Beta channel from ";
+    warning += "<a href=\"http://www.google.com/landing/chrome/beta\">here</a>"
+    browser.innerHTML = warning;
+  } else {
+    browserAndVersionOK = true;
+  }
 }
 
 var worker = new Worker('js/worker.js');
@@ -109,6 +126,13 @@ function runLargeJSBenchmarks() {
   worker.postMessage({'type':'runlarge', 'msg':''}); // Start the worker.
 }
 
+function runBenchmarks() {
+  if (!browserAndVersionOK) {
+    return;
+  }
+  runSmallNaclBenchmarks();
+  runSmallJSBenchmarks();
+}
 
 </script>
 </head>
@@ -159,27 +183,18 @@ higher scores means better performance: <em>Bigger is better!</em>
 
 <p>
 
-<tr style="text-align: center">
-<div class="run">
-  <h3 align="center">NaCl is x times faster than JS:</h3>
-  <br />
-  <div id="comparisons" align="center">
-  </div>
-</div>
+<input type="button" style="width:240px" value="Start Benchmarks" onclick="runBenchmarks()" />
+<div id="badBrowserOrVersion"></div>
 
 <div class="run">
   <h3>JS Status:</h3>
   <div id="JsStatus" class="status">Not running</div>
-  <input type="button" value="Start Small JS Benchmarks" onclick="runSmallJSBenchmarks()" />
-  <input type="button" value="Start Large JS Benchmarks" onclick="runLargeJSBenchmarks()" />
-  <div id="JsResults" align="center"><br />
+  <div id="JsResults" align="left" style="margin-left:40px"><br />
   </div>
 </div>
 <div class="run">
   <h3>NaCl Status:</h3>
   <div id="NaclStatus" class="status">Module not loaded</div>
-  <input type="button" value="Start Small NaCl benchmarks" onclick="runSmallNaclBenchmarks()"/>
-  <input type="button" value="Start Large NaCl benchmarks" onclick="runLargeNaclBenchmarks()"/>
   <!-- Load the published .nexe.  This includes the 'src' attribute which
   shows how to load multi-architecture modules.  Each entry in the "nexes"
   object in the  .nmf manifest file is a key-value pair: the key is the runtime
@@ -204,7 +219,7 @@ higher scores means better performance: <em>Bigger is better!</em>
            src="benchmark.nmf"
            type="application/x-nacl" />
   </div>
-  <div id="NaclResults" align="center">
+  <div id="NaclResults" align="left" style="margin-left:40px">
   </div>
 </div>
 
