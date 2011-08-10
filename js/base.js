@@ -78,7 +78,7 @@ BenchmarkSuite.suites = [];
 // Scores are not comparable across versions. Bump the version if
 // you're making changes that will affect that scores, e.g. if you add
 // a new benchmark or change an existing one.
-BenchmarkSuite.version = '0.1';
+BenchmarkSuite.version = '0.2';
 
 BenchmarkSuite.run_model = "repeated";
 

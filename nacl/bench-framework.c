@@ -112,26 +112,26 @@ static double GeometricMean() {
 }
 
 void SetupSmallBenchmarks() {
-  RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 10, 490000);
-  RegisterBenchmark(strdup("Nbody"), run_nbody, 1000000, 730000);
-  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 57758);
-  RegisterBenchmark(strdup("Fasta"), run_fasta, 10000, 40779);
-  RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 4944);
-  RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 15, 285180);
-  RegisterBenchmark(strdup("Knucleotide"), run_knucleotide, 0, 113680);
-  RegisterBenchmark(strdup("Pidigits"), run_pidigits, 1000, 1050000);
+  RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 10, 64052288);
+  RegisterBenchmark(strdup("Nbody"), run_nbody, 1000000, 73000000);
+  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 150020779);
+  RegisterBenchmark(strdup("Fasta"), run_fasta, 10000, 51667385);
+  RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 23542857);
+  RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 15, 383306452);
+  RegisterBenchmark(strdup("Knucleotide"), run_knucleotide, 0, 433893130);
+  RegisterBenchmark(strdup("Pidigits"), run_pidigits, 1000, 406976744);
   run_model = kRunModelRepeated;
 }
 
 void SetupLargeBenchmarks() {
-  RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 11, 490000);
-  RegisterBenchmark(strdup("Nbody"), run_nbody, 10000000, 730000);
-  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 57758);
-  RegisterBenchmark(strdup("Fasta"), run_fasta, 3000000, 40779);
-  RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 4944);
-  RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 18, 285180);
-  RegisterBenchmark(strdup("Knucleotide"), run_knucleotide, 0, 113680);
-  RegisterBenchmark(strdup("Pidigits"), run_pidigits, 5000, 1050000);
+  RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 11, 64052288);
+  RegisterBenchmark(strdup("Nbody"), run_nbody, 10000000, 73000000);
+  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 150020779);
+  RegisterBenchmark(strdup("Fasta"), run_fasta, 3000000, 51667385);
+  RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 23542857);
+  RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 18, 383306452);
+  RegisterBenchmark(strdup("Knucleotide"), run_knucleotide, 0, 433893130);
+  RegisterBenchmark(strdup("Pidigits"), run_pidigits, 5000, 406976744);
   run_model = kRunModelOnce;
 }
 
