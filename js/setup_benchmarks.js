@@ -30,8 +30,6 @@ function SetRunModel(model) {
   BenchmarkSuite.run_model = model;
 }
 
-// This function is duplicated in run.js but it has to run after loading
-// all the individual benchmarks which is different at the CLI
 function SetupSmallBenchmarks() {
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10);
   SetupBenchmark("Nbody", NbodyBenchmark, 1000000);

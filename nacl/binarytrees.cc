@@ -15,6 +15,7 @@
 
 #include "boost/pool/object_pool.hpp"
 
+#include "bench-framework.h"
 
 const size_t	LINE_SIZE = 64;
 

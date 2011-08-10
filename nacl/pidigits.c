@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gmp.h>
+#include "bench-framework.h"
 
 static mpz_t numer, accum, denom, tmp1, tmp2;
 

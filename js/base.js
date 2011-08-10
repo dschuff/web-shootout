@@ -290,20 +290,3 @@ BenchmarkSuite.prototype.RunStep = function(runner) {
   // Start out running the setup.
   return RunNextSetup();
 }
-
-// Instead of V8-style registration of the benchmarks in their own files,
-// do it here all together, to make changing parameters easier
-
-function SetupBenchmark(name, entrypoint, param, time_ref) {
-  var benchmark = new BenchmarkSuite(name, time_ref, [
-    new Benchmark(name, function () { entrypoint(param) } )
-  ]);
-}
-
-function ClearBenchmarks() {
-  BenchmarkSuite.suites = [];
-}
-
-function SetRunModel(model) {
-  BenchmarkSuite.run_model = model;
-}

@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bench-framework.h"
+
 #define false 0
 #define true  1
 
@@ -257,10 +259,10 @@ spectralnorm(int N)
 {
   double result = spectral_game(N);
   // printf("%.9f\n", result);
-  if (fabs(result - reference_result) > .0000001) return -1;
+  if (N == 350 && fabs(result - reference_result) > .0000001) return -1;
     return 0;
 }
 
-int run_spectralnorm() {
-  return spectralnorm(350);
+int run_spectralnorm(int N) {
+  return spectralnorm(N);
 }

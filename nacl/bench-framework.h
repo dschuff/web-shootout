@@ -1,6 +1,10 @@
 #ifndef BENCHFRAMEWORK_H
 #define BENCHFRAMEWORK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_BENCHMARKS 8
 
 typedef int (*bench_function)(int);
@@ -42,5 +46,9 @@ int framework_main(enum benchmark_size_t size);
 void ReportStatus(const char *format, ...);
 
 //#define memcpy(d, s, n)    __builtin_memcpy ((d), (s), (n))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
