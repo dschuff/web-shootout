@@ -1,13 +1,13 @@
-    helloWorldModule = null;  // Global application object.
+var benchmarkNaClModule = null;  // Global application object.
     statusText = 'NO-STATUS';
 
     // When the NaCl module has loaded, hook up an event listener to handle
     // messages coming from it, and then indicate success.
     function moduleDidLoad() {
-      helloWorldModule = document.getElementById('hello_world');
+      benchmarkNaClModule = document.getElementById('benchmark_nexe');
       // Add a message handler that accepts messages coming from the NaCl
       // module.
-      helloWorldModule.addEventListener('message', handleMessage, false);
+      benchmarkNaClModule.addEventListener('message', handleMessage, false);
       updateStatus('Module Loaded');
     }
 
@@ -18,7 +18,7 @@
 
     // Handle a message coming from the NaCl module.
     function handleMessage(message_event) {
-      console.log("got " + message_event.data);
+      console.log("nexe said: " + message_event.data);
       if (message_event.data.search(":") != -1 &&
           message_event.data.search("Score") == -1) {
           updateResultBox(message_event);
@@ -31,8 +31,8 @@
     // status message indicating that the module is still loading.  Otherwise,
     // do not change the status message.
     function pageDidLoad() {
-      if (helloWorldModule == null) {
-        updateStatus('LOADING...');
+      if (benchmarkNaClModule == null) {
+        updateStatus('Loading module...');
       } else {
         // It's possible that the Native Client module onload event fired
         // before the page's onload event.  In this case, the status message
@@ -42,31 +42,27 @@
       }
     }
 
-    function fortyTwo() {
-      helloWorldModule.postMessage('fortyTwo');
-    }
-
 function ClearNaclResults() {
-  var results = document.getElementById("NaclResults");
+  var results = document.getElementById("NaclStatus");
   // Only clear after we have completed a run
   if (results.innerHTML.search("Score:") != -1) {
-    results.innerHTML = "";
+    document.getElementById("NaclResults").innerHTML = "<br />";
   }
 }
 
 function runSmallNaclBenchmarks() {
     ClearNaclResults();
-    helloWorldModule.postMessage('runBenchmarks small');
+    benchmarkNaClModule.postMessage('runBenchmarks small');
 }
 function runLargeNaclBenchmarks() {
     ClearNaclResults();
-    helloWorldModule.postMessage('runBenchmarks large');
+    benchmarkNaClModule.postMessage('runBenchmarks large');
 }
 
     function reverseText() {
       // Grab the text from the text box, pass it into reverseText()
       var inputBox = document.forms.helloForm.inputBox;
-      helloWorldModule.postMessage('reverseText:' + inputBox.value);
+      benchmarkNaClModule.postMessage('reverseText:' + inputBox.value);
       // Note: a |false| return tells the <form> tag to cancel the GET action
       // when submitting the form.
       return false;

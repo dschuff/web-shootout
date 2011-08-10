@@ -25,10 +25,10 @@ function AddResult(text) {
 }
 
 function ClearJsResults() {
-  var results = document.getElementById("JsResults");
+  var results = document.getElementById("JsStatus");
   // Only clear after we have completed a run
   if (results.innerHTML.search("Score:") != -1) {
-    results.innerHTML = "<br />";
+    document.getElementById("JsResults").innerHTML = "<br />";
   }
 }
 
@@ -111,11 +111,20 @@ worker.addEventListener('message', function(e) {
       break;
     case "score":
       AddScore(msg);
+      document.getElementById('runButton').disabled = false;
       break;
     default:
       alert("couldn't determine type of worker message");
   }
 }, false);
+
+function handleNaClBenchmarkFinish(message_event) {
+  if (message_event.data.search(":") != -1 &&
+      message_event.data.search("Score") != -1) {
+    runLargeJSBenchmarks();
+    benchmarkNaClModule.removeEventListener('message', handleNaClBenchmarkFinish, false);
+  }
+}
 
 function runSmallJSBenchmarks() {
   ClearJsResults();
@@ -130,8 +139,9 @@ function runBenchmarks() {
   if (!browserAndVersionOK) {
     return;
   }
-  runSmallNaclBenchmarks();
-  runSmallJSBenchmarks();
+  document.getElementById('runButton').disabled = true;
+  benchmarkNaClModule.addEventListener('message', handleNaClBenchmarkFinish, false);
+  runLargeNaclBenchmarks();
 }
 
 </script>
@@ -183,7 +193,7 @@ higher scores means better performance: <em>Bigger is better!</em>
 
 <p>
 
-<input type="button" style="width:240px" value="Start Benchmarks" onclick="runBenchmarks()" />
+<input id="runButton" type="button" style="width:240px" value="Start Benchmarks" onclick="runBenchmarks()" />
 <div id="badBrowserOrVersion"></div>
 
 <div class="run">
@@ -214,7 +224,7 @@ higher scores means better performance: <em>Bigger is better!</em>
     </script>
 
     <embed name="nacl_module"
-           id="hello_world"
+           id="benchmark_nexe"
            width=0 height=0
            src="benchmark.nmf"
            type="application/x-nacl" />
