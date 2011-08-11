@@ -175,6 +175,10 @@ score means the benchmark ran twice as fast. <em>Bigger is better!</em>
 <tr/><td>
 <li><b>Fannkuchredux</b><br>Indexed access to tiny integer sequence: 
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=fannkuchredux">about</a></li>
+<li><b>Nbody</b><br>Perform an N-body simulation of the Jovian planets:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=nbody">about</a></li>
+<li><b>Spectralnorm</b><br>Calculate an eigenvalue using the power method:
+<a href="http://shootout.alioth.debian.org/u32/performance.php?test=spectralnorm">about</a></li>
 <li><b>Fasta</b><br>Generate and write random DNA sequences: 
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=fasta">about</a></li>
 <li><b>Revcomp</b><br>Read DNA sequences - write their reverse-complement:
@@ -183,10 +187,6 @@ score means the benchmark ran twice as fast. <em>Bigger is better!</em>
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=binarytrees">about</a></li>
 <li><b>Knucleotide</b><br>Repeatedly update hashtables and k-nucleotide strings:
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=knucleotide">about</a></li>
-<li><b>Nbody</b><br>Perform an N-body simulation of the Jovian planets:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=nbody">about</a></li>
-<li><b>Spectralnorm</b><br>Calculate an eigenvalue using the power method:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=spectralnorm">about</a></li>
 <li><b>Pidigits</b><br>Calculate the digits of Pi with streaming arbitrary-precision arithmetic:
 <a href="http://shootout.alioth.debian.org/u32/performance.php?test=pidigits">about</a></li>
 </ul>
@@ -197,12 +197,6 @@ score means the benchmark ran twice as fast. <em>Bigger is better!</em>
 <input id="runButton" type="button" style="width:240px" value="Start Benchmarks" onclick="runBenchmarks()" />
 <div id="badBrowserOrVersion"></div>
 
-<div class="run">
-  <h3>JS Status:</h3>
-  <div id="JsStatus" class="status">Not running</div>
-  <div id="JsResults" align="left" style="margin-left:40px"><br />
-  </div>
-</div>
 <div class="run">
   <h3>NaCl Status:</h3>
   <div id="NaclStatus" class="status">Module not loaded</div>
@@ -231,6 +225,13 @@ score means the benchmark ran twice as fast. <em>Bigger is better!</em>
            type="application/x-nacl" />
   </div>
   <div id="NaclResults" align="left" style="margin-left:40px">
+  </div>
+</div>
+
+<div class="run">
+  <h3>JS Status:</h3>
+  <div id="JsStatus" class="status">Not running</div>
+  <div id="JsResults" align="left" style="margin-left:40px"><br />
   </div>
 </div>
 
