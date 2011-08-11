@@ -85,7 +85,7 @@ static int RunAll() {
     RunOne(bi, rd);
     usec_per_run = (double)rd->elapsed / (double)rd->runs;
     rd->score = 100.0 * bi->time_ref / usec_per_run;
-    ReportStatus("%s: %.2f", bi->name, rd->score);
+    ReportStatus("%s: %d", bi->name, (int)rd->score);
   }
   started = 0;
 }

@@ -237,7 +237,7 @@ do_process_block(
 int
 revcomp_main(void) {
 #ifdef  ARRAYFILE
-  long stdin_size = fasta_10k_ref_output_len;
+  long stdin_size = fasta_output_len;
 #else
     setvbuf(stdin, 0, _IOFBF, 1024*1024);
 

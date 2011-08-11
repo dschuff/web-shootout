@@ -190,7 +190,7 @@ char *
 read_stdin(int *stdin_size) {
     int input_size;
 #ifdef ARRAYFILE
-    input_size = fasta_10k_ref_output_len;
+    input_size = fasta_output_len;
 #else
     struct stat stat;
     fstat(0, &stat);
