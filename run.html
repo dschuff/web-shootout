@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
 <meta http-equiv="Content-Script-Type" content="text/javascript">
 <meta http-equiv="Content-Style-Type" content="text/css">
-<title>Web-shootout Benchmark Suite</title>
+<title>Native Client Benchmark Suite</title>
 <script type="text/javascript" src="js/base.js"></script>
 <script type="text/javascript" src="js/nacl.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
@@ -91,6 +91,7 @@ function Load() {
     browser.innerHTML = warning;
   } else {
     browserAndVersionOK = true;
+    runBenchmarks();
   }
 }
 
@@ -146,94 +147,96 @@ function runBenchmarks() {
 
 </script>
 </head>
-<body onload="Load(); pageDidLoad();">
+<body onload="Load();">
 <div>
-  <div class="title"><h1>Web-shootout Benchmark Suite - version <span id="version">?</span></h1></div>
+  <div class="title"><h1>Native Client Benchmark Suite - version <span id="version">?</span></h1></div>
   <div class="warning" id="obsolete"> 
-Warning! This is not the latest version of the V8 benchmark
+Warning! This is not the latest version of the Native Client benchmark
 suite. Consider running the   
-<a href="http://v8.googlecode.com/svn/data/benchmarks/current/run.html">
+<a href="http://naclbench.appspot.com/run.html">
 latest version</a>.  
   </div>
+  <div id="badBrowserOrVersion"></div>
+
   <table>
     <tr>
-      <tr class="contents">
-This page contains a suite of benchmarks from the
-<a href="http://shootout.alioth.debian.org">Computer Language
-Shootout</a>, which has implementations of the same tasks in many
-languages. The Javascript benchmark driver is taken from the V8 project
-and the Native Client driver with the same behavior is implemented in C
-in the native client module.
+      <td class="contents">
+This page contains a suite of benchmarks that have been used to tune Native Client.
 The final score is computed as the geometric mean of
 the individual results to make it independent of the running times of
 the individual benchmarks and of a reference system (score
 1000). Scores are not comparable across benchmark suite versions and
-higher scores means better performance: a score twice the size of another
-score means the benchmark ran twice as fast. <em>Bigger is better!</em>
+higher scores means better performance. <em>Bigger is better!</em>
+
 
 <ul>
-<tr/><td>
-<li><b>Fannkuchredux</b><br>Indexed access to tiny integer sequence: 
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=fannkuchredux">about</a></li>
-<li><b>Nbody</b><br>Perform an N-body simulation of the Jovian planets:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=nbody">about</a></li>
-<li><b>Spectralnorm</b><br>Calculate an eigenvalue using the power method:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=spectralnorm">about</a></li>
-<li><b>Fasta</b><br>Generate and write random DNA sequences: 
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=fasta">about</a></li>
-<li><b>Revcomp</b><br>Read DNA sequences - write their reverse-complement:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=revcomp">about</a></li>
-<li><b>Binarytrees</b><br>Allocate and deallocate many many binary trees:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=binarytrees">about</a></li>
-<li><b>Knucleotide</b><br>Repeatedly update hashtables and k-nucleotide strings:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=knucleotide">about</a></li>
-<li><b>Pidigits</b><br>Calculate the digits of Pi with streaming arbitrary-precision arithmetic:
-<a href="http://shootout.alioth.debian.org/u32/performance.php?test=pidigits">about</a></li>
+<li><b>Fannkuchredux</b><br>Indexed access to tiny integer sequence.</li>
+<li><b>Nbody</b><br>Perform an N-body simulation of the Jovian planets.</li>
+<li><b>Spectralnorm</b><br>Calculate an eigenvalue using the power method.</li>
+<li><b>Fasta</b><br>Generate and write random DNA sequences.</li>
+<li><b>Revcomp</b><br>Read DNA sequences - write their reverse-complement.</li>
+<li><b>Binarytrees</b><br>Allocate and deallocate many many binary trees.</li>
+<li><b>Knucleotide</b><br>Repeatedly update hashtables and k-nucleotide strings.</li>
+<li><b>Pidigits</b><br>Calculate the digits of Pi with streaming arbitrary-precision arithmetic.</li>
 </ul>
-<td/>
+
+<div>
+Note that benchmark results are not comparable unless both results are run 
+with the same revision of the benchmark suite.
+We will be making revisions from time to time in order to fix bugs or expand
+the scope of the benchmark suite.
+For previous revisions and the change log see the <a href="revisions.html">revisions</a> page.
+</div>
 
 <p>
+The benchmarks are derived from the
+<a href="http://shootout.alioth.debian.org">Computer Language
+Shootout</a>, which has implementations of the same tasks in many
+languages (including C and JavaScript, which are used here).
+The benchmark drivers are derived from the 
+<a href="http://v8.googlecode.com/svn/data/benchmarks/current/run.html">V8 Benchmark Suite</a>.
+You can find the source code at <a href="http://code.google.com/p/web-shootout">code.google.com/p/web-shootout</a>.
+</p>
 
-<input id="runButton" type="button" style="width:240px" value="Start Benchmarks" onclick="runBenchmarks()" />
-<div id="badBrowserOrVersion"></div>
+<p>
+<b>Important note:</b>
+Since the C and JavaScript benchmarks are completely different implementations,
+contrasting the benchmark results are a bit of an 
+<a href="http://shootout.alioth.debian.org/dont-jump-to-conclusions.php#comparison">apples and oranges</a>
+comparison.
+Also keep in mind that benchmarks are at best approximate indicators of realistic 
+application performance, and performance is only one of many factors to consider when 
+evaluating Native Client.
+</p>
 
-<div class="run">
-  <h3>NaCl Status:</h3>
-  <div id="NaclStatus" class="status">Module not loaded</div>
-  <!-- Load the published .nexe.  This includes the 'src' attribute which
-  shows how to load multi-architecture modules.  Each entry in the "nexes"
-  object in the  .nmf manifest file is a key-value pair: the key is the runtime
-  ('x86-32', 'x86-64', etc.); the value is a URL for the desired NaCl module.
-  To load the debug versions of your .nexes, set the 'src' attribute to the
-  _dbg.nmf version of the manifest file.
+<td/>
 
-  Note that the <EMBED> element is wrapped inside a <DIV>, which has a 'load'
-  event listener attached.  This method is used instead of attaching the 'load'
-  event listener directly to the <EMBED> element to ensure that the listener
-  is active before the NaCl module 'load' event fires.
-  -->
-  <div id="listener">
-    <script type="text/javascript">
-      document.getElementById('listener')
-          .addEventListener('load', moduleDidLoad, true);
-    </script>
+<td style="text-align: center">
 
-    <embed name="nacl_module"
-           id="benchmark_nexe"
-           width=0 height=0
-           src="benchmark.nmf"
-           type="application/x-nacl" />
+<div id="nacl" class="run">
+  <script type="text/javascript">
+    document.getElementById('nacl')
+        .addEventListener('load', moduleDidLoad, true);
+  </script>
+  <h3>Native Client</h3>
+  <div id="NaClStatus" class="status">Module not loaded</div>
+  <embed name="nacl_module"
+         id="benchmark_nexe"
+         width=0 height=0
+         src="benchmark.nmf"
+         type="application/x-nacl" />
+  <div id="NaClResults" align="left" style="margin-left:40px">
   </div>
-  <div id="NaclResults" align="left" style="margin-left:40px">
+</div>
+
+<div id="javascript" class="run">
+  <h3>JavaScript</h3>
+  <div id="JSStatus" class="status"></div>
+  <div id="JSResults" align="left" style="margin-left:40px"><br />
   </div>
 </div>
 
-<div class="run">
-  <h3>JS Status:</h3>
-  <div id="JsStatus" class="status">Not running</div>
-  <div id="JsResults" align="left" style="margin-left:40px"><br />
-  </div>
-</div>
+</td>
 
 </tr></tr></table>
 
