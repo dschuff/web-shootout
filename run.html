@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-  "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
@@ -8,43 +7,13 @@
 <title>Native Client Benchmark Suite</title>
 <script type="text/javascript" src="js/base.js"></script>
 <script type="text/javascript" src="js/nacl.js"></script>
+<script type="text/javascript" src="js/js.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript">
-var success = true;
 browserAndVersionOK = false;
 
-function ShowProgress(text) {
-  var JsStatus = document.getElementById("JsStatus");
-  JsStatus.innerHTML = text;
-}
-
-function AddResult(text) {
-  var results = document.getElementById("JsResults");
-  results.innerHTML += (text + "<br>");
-  var nameAndScore = text.split(':');
-}
-
-function ClearJsResults() {
-  var results = document.getElementById("JsStatus");
-  // Only clear after we have completed a run
-  if (results.innerHTML.search("Score:") != -1) {
-    document.getElementById("JsResults").innerHTML = "<br />";
-  }
-}
-
-function AddError(name, error) {
-  AddResult(name, '<b>error<\/b>');
-  success = false;
-}
-
-function AddScore(score) {
-  var JsStatus = document.getElementById("JsStatus");
-  if (success) {
-    JsStatus.innerHTML = "Score: " + score;
-  }
-}
-
 function ShowWarningIfObsolete() {
+return;
   // If anything goes wrong we will just catch the exception and no 
   // warning is shown, i.e., no harm is done.
   try {
@@ -69,105 +38,128 @@ function ShowWarningIfObsolete() {
   }
 }
 
-function ChromeVersion() {
-  try {
-    return parseFloat(navigator.userAgent.match(/Chrome\/(\d+\.\d+)/)[1]) || undefined;
-  } catch(e) {}
-  return undefined;
+function checkBrowserIsChrome() {
+    return window.navigator.appVersion.match(/Chrome\/(.*?) /) != null;
+}
+
+function checkChromeVersion() {
+    var ver = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+    return ver >= 14;
+}
+
+function checkPlugins() {
+  for (var i = 0; i < navigator.plugins.length; i++) {
+    if (navigator.plugins[i].name == "Native Client") {
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkNaclEnabled() {
+  return typeof benchmarkNaClModule !== "undefined" &&
+         typeof benchmarkNaClModule.postMessage !== "undefined";
 }
 
 function Load() {
-  var version = BenchmarkSuite.version;
-  document.getElementById("version").innerHTML = version;
-  ShowWarningIfObsolete();
-  // Check if the version of Chrome is OK
-  chromeVersion = ChromeVersion();
-  if (!chromeVersion || chromeVersion < 14) {
-    var browser = document.getElementById("badBrowserOrVersion");
-    var warning = "<br/>";
-    warning += "These benchmarks require Google Chrome Beta channel (Chrome 14) <br/>";
-    warning += "Please download the Google Chrome Beta channel from ";
-    warning += "<a href=\"http://www.google.com/landing/chrome/beta\">here</a>"
-    browser.innerHTML = warning;
+  setupNaclBenchmark();
+
+  document.getElementById("version").innerHTML = BenchmarkSuite.version;
+
+  var warning = document.getElementById("badBrowserOrVersion");
+  var warning_msg = "";
+
+  if (!checkBrowserIsChrome()) {
+    warning_msg = "The Native Client Benchmark Suite requires Google Chrome to run. <br/>";
+  } else if (!checkChromeVersion()) {
+    warning_msg = "The Native Client Benchmark Suite requires Google Chrome 14 or later. <br/>"
+                "Please download the Google Chrome Beta channel from "
+                "<a href=\"http://www.google.com/landing/chrome/beta\">here</a>";
+  } else if (!checkPlugins()) {
+    warning_msg = "The Native Client Benchmark Suite requires that Native Client is enabled.";
+  } else if (!checkNaclEnabled() && !chrome.app.isInstalled) {
+    warning_msg = "The Native Client Benchmark Suite must be installed from the Chrome Webstore "
+                  "in order to run.";
   } else {
     browserAndVersionOK = true;
-    runBenchmarks();
   }
-}
-
-var worker = new Worker('js/worker.js');
-worker.addEventListener('message', function(e) {
-  console.log('Worker said: ', e.data);
-  var msgtype = e.data.type;
-  var msg = e.data.msg;
-  switch (msgtype) {
-    case "status":
-      ShowProgress(msg);
-      break;
-    case "result":
-      AddResult(msg);
-      break;
-    case "error":
-      AddError(msg);
-      break;
-    case "score":
-      AddScore(msg);
-      document.getElementById('runButton').disabled = false;
-      break;
-    default:
-      alert("couldn't determine type of worker message");
-  }
-}, false);
-
-function handleNaClBenchmarkFinish(message_event) {
-  if (message_event.data.search(":") != -1 &&
-      message_event.data.search("Score") != -1) {
-    runLargeJSBenchmarks();
-    benchmarkNaClModule.removeEventListener('message', handleNaClBenchmarkFinish, false);
-  }
-}
-
-function runSmallJSBenchmarks() {
-  ClearJsResults();
-  worker.postMessage({'type':'runsmall', 'msg':''}); // Start the worker.
-}
-function runLargeJSBenchmarks() {
-  ClearJsResults();
-  worker.postMessage({'type':'runlarge', 'msg':''}); // Start the worker.
-}
-
-function runBenchmarks() {
   if (!browserAndVersionOK) {
-    return;
+     warning.innerHTML = warning_msg;
+     warning.style.display="block";
   }
-  document.getElementById('runButton').disabled = true;
-  benchmarkNaClModule.addEventListener('message', handleNaClBenchmarkFinish, false);
-  runLargeNaclBenchmarks();
+  ShowWarningIfObsolete();
+}
+
+function naclBenchmarkFinished() {
+  runJSBenchmarks();
+}
+
+function jsBenchmarkFinished() {
+}
+
+function naclDoneWaiting() {
+  document.getElementById("benchmark").className = "";
 }
 
 </script>
 </head>
+
 <body onload="Load();">
-<div>
-  <div class="title"><h1>Native Client Benchmark Suite - version <span id="version">?</span></h1></div>
-  <div class="warning" id="obsolete"> 
+
+<div id="module_wrapper">
+<script type="text/javascript">
+  setupNaclListeners(document.getElementById('module_wrapper'));
+</script>
+<embed name="nacl_module"
+       id="benchmark_nexe"
+       width=0 height=0
+       src="benchmark.nmf"
+       type="application/x-nacl" />
+</div>
+
+<div class="title">
+<h1>Native Client Benchmark Suite - version <span id="version">?</span>
+</h1></div>
+
+<div class="warning" id="obsolete"> 
 Warning! This is not the latest version of the Native Client benchmark
 suite. Consider running the   
 <a href="http://naclbench.appspot.com/run.html">
-latest version</a>.  
-  </div>
-  <div id="badBrowserOrVersion"></div>
+latest version</a>.
+</div>
 
-  <table>
-    <tr>
-      <td class="contents">
-This page contains a suite of benchmarks that have been used to tune Native Client.
+<div class="warning" id="badBrowserOrVersion"></div>
+
+<div id="benchmark" class="disabled">
+
+<div id="results">
+
+<div id="nacl" class="run">
+  <h3>Native Client </h3>
+  <div id="nacl_status" class="status"></div>
+  <div id="nacl_results" class="results"></div>
+  <div class="spinner">X</div>
+</div>
+
+<div id="javascript" class="run">
+  <h3>JavaScript</h3>
+  <div id="js_status" class="status"></div>
+  <div id="js_results" class="results"></div>
+  <div class="spinner">X</div>
+</div>
+
+</div>
+
+<div id="contents">
+<div>
+This page contains a suite of benchmarks that have been used to measure the performance
+of Native Client.
 The final score is computed as the geometric mean of
 the individual results to make it independent of the running times of
 the individual benchmarks and of a reference system (score
 1000). Scores are not comparable across benchmark suite versions and
 higher scores means better performance. <em>Bigger is better!</em>
-
+</div>
 
 <ul>
 <li><b>Fannkuchredux</b><br>Indexed access to tiny integer sequence.</li>
@@ -180,22 +172,22 @@ higher scores means better performance. <em>Bigger is better!</em>
 <li><b>Pidigits</b><br>Calculate the digits of Pi with streaming arbitrary-precision arithmetic.</li>
 </ul>
 
-<div>
+<p>
 Note that benchmark results are not comparable unless both results are run 
 with the same revision of the benchmark suite.
 We will be making revisions from time to time in order to fix bugs or expand
 the scope of the benchmark suite.
 For previous revisions and the change log see the <a href="revisions.html">revisions</a> page.
-</div>
+</p>
 
 <p>
 The benchmarks are derived from the
-<a href="http://shootout.alioth.debian.org">Computer Language
-Shootout</a>, which has implementations of the same tasks in many
-languages (including C and JavaScript, which are used here).
+<a href="http://shootout.alioth.debian.org">Computer Language Benchmark Game</a>,
+which has implementations of the same tasks in many languages 
+(including C and JavaScript, which are used here).
 The benchmark drivers are derived from the 
 <a href="http://v8.googlecode.com/svn/data/benchmarks/current/run.html">V8 Benchmark Suite</a>.
-You can find the source code at <a href="http://code.google.com/p/web-shootout">code.google.com/p/web-shootout</a>.
+You can find the source code for this site at <a href="http://code.google.com/p/web-shootout">code.google.com/p/web-shootout</a>.
 </p>
 
 <p>
@@ -209,36 +201,7 @@ application performance, and performance is only one of many factors to consider
 evaluating Native Client.
 </p>
 
-<td/>
-
-<td style="text-align: center">
-
-<div id="nacl" class="run">
-  <script type="text/javascript">
-    document.getElementById('nacl')
-        .addEventListener('load', moduleDidLoad, true);
-  </script>
-  <h3>Native Client</h3>
-  <div id="NaClStatus" class="status">Module not loaded</div>
-  <embed name="nacl_module"
-         id="benchmark_nexe"
-         width=0 height=0
-         src="benchmark.nmf"
-         type="application/x-nacl" />
-  <div id="NaClResults" align="left" style="margin-left:40px">
-  </div>
 </div>
-
-<div id="javascript" class="run">
-  <h3>JavaScript</h3>
-  <div id="JSStatus" class="status"></div>
-  <div id="JSResults" align="left" style="margin-left:40px"><br />
-  </div>
-</div>
-
-</td>
-
-</tr></tr></table>
 
 </div>
 
