@@ -284,7 +284,6 @@ struct arrayfile_struct {
 };
 
 arrayfile_t * arrayfile_fopen(const char *name, const char *mode) {
-  int i;
   arrayfile_t *file = (arrayfile_t *)malloc(sizeof(arrayfile_t));
   if (!file) return NULL;
 

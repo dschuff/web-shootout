@@ -17,7 +17,7 @@ static run_data bench_run_data[MAX_BENCHMARKS];
 enum run_model_t { kRunModelRepeated, kRunModelOnce };
 static enum run_model_t run_model;
 
-int RegisterBenchmark(char *name, bench_function entry, int param, int time_ref) {
+void RegisterBenchmark(char *name, bench_function entry, int param, int time_ref) {
   bench_info_list[benchmark_count].name = name;
   bench_info_list[benchmark_count].run = entry;
   bench_info_list[benchmark_count].time_ref = time_ref;
@@ -31,7 +31,6 @@ void ClearBenchmarks() {
 }
 
 static int RunOne(bench_info *bench, run_data *data) {
-  int runs;
   struct timeval start, end;
   int diff;
   if (run_model == kRunModelRepeated) {
@@ -60,20 +59,7 @@ static int RunOne(bench_info *bench, run_data *data) {
   return 0;
 }
 
-static int RunOneLong(bench_info *bench, run_data *data) {
-  struct timeval start, end;
-  int diff;
-  gettimeofday(&start, NULL);
-  assert(bench->run(bench->param) == 0);
-  gettimeofday(&end, NULL);
-  diff = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
-  data->elapsed = diff;
-  data->runs = 1;
-  return 0;
-}
-
-
-static int RunAll() {
+static void RunAll() {
   int i;
   for (i = 0; i < benchmark_count; i++) {
     run_data *rd = &bench_run_data[i];
@@ -90,7 +76,7 @@ static int RunAll() {
   started = 0;
 }
 
-static int PrintScores() {
+static void PrintScores() {
   int i;
   for (i = 0; i < benchmark_count; i++) {
     printf("Benchmark %s: usec %d, iters %d, usec/run %d score %.2f\n", 

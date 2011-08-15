@@ -34,7 +34,7 @@ endif
 
 NACLCC = $(NACL_CC_PATH)/$(NACL_CC_BASE)-gcc
 NACLCXX = $(NACL_CC_PATH)/$(NACL_CC_BASE)-g++
-CCFLAGS ?= -O3 -g -mfpmath=sse -msse3 -march=nocona
+CCFLAGS ?= -O3 -g -mfpmath=sse -msse3 -march=nocona -D_GNU_SOURCE
 CFLAGS = $(CCFLAGS) -std=gnu99
 CXXFLAGS = $(CCFLAGS)
 LIBS = -lm -lpthread

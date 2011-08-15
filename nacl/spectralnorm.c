@@ -9,7 +9,6 @@
  * Reconversion into C by Dan Farina
  */
 
-#define _GNU_SOURCE
 //#include <omp.h>
 #include <math.h>
 #include <sched.h>

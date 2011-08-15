@@ -5,7 +5,9 @@
 #include "bench-framework.h"
 
 int main(int argc, char **argv) {
+  printf("Running small benchmarks\n");
   framework_main(kBenchmarkSmall);
+  printf("Running large benchmarks (same size as web page))\n");
   framework_main(kBenchmarkLarge);
 }
 

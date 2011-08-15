@@ -5,7 +5,6 @@
  */
 
 // _GNU_SOURCE to get fputs_unlocked
-#define _GNU_SOURCE
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
