@@ -6,6 +6,8 @@
 // specific to the benchmarks (e.g. parameters or normalization) goes here.
 
 var normalization_constants = Object(); 
+normalization_constants["Richards"] = 35302;
+normalization_constants["DeltaBlue"] = 66118;
 normalization_constants["Fannkuchredux"] = 64052288;
 normalization_constants["Nbody"] = 73000000;
 normalization_constants["Spectralnorm"] = 150020779;
@@ -31,6 +33,8 @@ function SetRunModel(model) {
 }
 
 function SetupSmallBenchmarks() {
+  SetupBenchmark("Richards", RichardsBenchmark, 10000);
+  SetupBenchmark("DeltaBlue", DeltaBlueBenchmark, 100);
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10);
   SetupBenchmark("Nbody", NbodyBenchmark, 1000000);
   SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350);
@@ -44,6 +48,8 @@ function SetupSmallBenchmarks() {
 }
 
 function SetupLargeBenchmarks() {
+  SetupBenchmark("Richards", RichardsBenchmark, 1000000);
+  SetupBenchmark("DeltaBlue", DeltaBlueBenchmark, 10000);
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 11);
   SetupBenchmark("Nbody", NbodyBenchmark, 10000000);
   SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 5500);

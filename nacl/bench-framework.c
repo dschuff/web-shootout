@@ -18,6 +18,10 @@ enum run_model_t { kRunModelRepeated, kRunModelOnce };
 static enum run_model_t run_model;
 
 void RegisterBenchmark(char *name, bench_function entry, int param, int time_ref) {
+  if (benchmark_count == MAX_BENCHMARKS) {
+    ReportStatus("Too many benchmarks. Increase MAX_BENCHMARKS in framework\n");
+    exit(1);
+  }
   bench_info_list[benchmark_count].name = name;
   bench_info_list[benchmark_count].run = entry;
   bench_info_list[benchmark_count].time_ref = time_ref;
@@ -71,6 +75,7 @@ static void RunAll() {
     RunOne(bi, rd);
     usec_per_run = (double)rd->elapsed / (double)rd->runs;
     rd->score = 100.0 * bi->time_ref / usec_per_run;
+    printf("usec_per_run %f\n", usec_per_run);
     ReportStatus("%s: %d", bi->name, (int)rd->score);
   }
   started = 0;
@@ -98,6 +103,8 @@ static double GeometricMean() {
 }
 
 void SetupSmallBenchmarks() {
+  RegisterBenchmark(strdup("Richards"), run_richards, 10000, 35302);
+  RegisterBenchmark(strdup("Deltablue"), run_deltablue, 100, 66118);
   RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 10, 64052288);
   RegisterBenchmark(strdup("Nbody"), run_nbody, 1000000, 73000000);
   RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 150020779);
@@ -110,6 +117,8 @@ void SetupSmallBenchmarks() {
 }
 
 void SetupLargeBenchmarks() {
+  RegisterBenchmark(strdup("Richards"), run_richards, 1000000, 35302);
+  RegisterBenchmark(strdup("Deltablue"), run_deltablue, 10000, 66118);
   RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 11, 64052288);
   RegisterBenchmark(strdup("Nbody"), run_nbody, 10000000, 73000000);
   RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 150020779);

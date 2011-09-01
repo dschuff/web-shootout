@@ -34,9 +34,10 @@ nacl_env.Append(CPPPATH=['include'],
 
 
 
-benchmark_sources = ['binarytrees.cc', 'fannkuchredux.c', 'fasta.c', 
-                     'revcomp.c', 'knucleotide.c', 'nbody.c', 
-                     'pidigits.c', 'spectralnorm.c']
+benchmark_sources = ['binarytrees.cc', 'fannkuchredux.c', 'fasta.c',
+                     'revcomp.c', 'knucleotide.c', 'nbody.c',
+                     'pidigits.c', 'spectralnorm.c', 'richards.c',
+                     'deltablue.c']
 framework_sources = ['bench-framework.c', 'benchstringio.c', 'fasta_10k_ref_output.c']
 sources = benchmark_sources + framework_sources
 

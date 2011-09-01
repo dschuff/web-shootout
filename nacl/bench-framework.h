@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define MAX_BENCHMARKS 8
+#define MAX_BENCHMARKS 16
 
 typedef int (*bench_function)(int);
 typedef int (*report_function)(char *, ...);
@@ -39,6 +39,9 @@ int run_knucleotide(int ignored);
 int run_nbody(int p);
 int run_pidigits(int p);
 int run_spectralnorm(int p);
+
+int run_richards(int p);
+int run_deltablue(int p);
 
 enum benchmark_size_t { kBenchmarkSmall, kBenchmarkLarge };
 

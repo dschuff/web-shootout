@@ -31,6 +31,8 @@ load("fasta_10k_ref_output.js");
 load('io_replacement.js');
 load('biginteger.js');
 
+load('richards.js');
+load('deltablue.js');
 load('fannkuchredux.js');
 load('fasta.js');
 load('revcomp.js');
@@ -65,7 +67,7 @@ function PrintScore(score) {
 
 // Uncomment the following to run the small benchmarks for testing
 // before running the larger ones
-/*
+
 SetupSmallBenchmarks();
 
 BenchmarkSuite.RunSuites({ NotifyResult: PrintResult,
@@ -73,7 +75,7 @@ BenchmarkSuite.RunSuites({ NotifyResult: PrintResult,
                            NotifyScore: PrintScore });
 
 ClearBenchmarks();
-*/
+
 
 SetupLargeBenchmarks();
 BenchmarkSuite.RunSuites({ NotifyResult: PrintResult,

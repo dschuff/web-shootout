@@ -42,7 +42,7 @@ LIBDIR = ../third_party/libinstall/$(BITS)/lib
 
 
 BENCHMARKS := fannkuchredux fasta revcomp binarytrees knucleotide nbody \
-		spectralnorm pidigits
+		spectralnorm pidigits richards deltablue
 OTHER_OBJS = bench-framework benchstringio fasta_10k_ref_output
 
 OBJS_NATIVE := $(BENCHMARKS:%=%.native.o) $(OTHER_OBJS:%=%.native.o)
