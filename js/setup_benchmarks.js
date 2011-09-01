@@ -6,8 +6,8 @@
 // specific to the benchmarks (e.g. parameters or normalization) goes here.
 
 var normalization_constants = Object(); 
-normalization_constants["Richards"] = 35302;
-normalization_constants["DeltaBlue"] = 66118;
+normalization_constants["Richards"] = 2499257;
+normalization_constants["DeltaBlue"] = 429919;
 normalization_constants["Fannkuchredux"] = 64052288;
 normalization_constants["Nbody"] = 73000000;
 normalization_constants["Spectralnorm"] = 150020779;

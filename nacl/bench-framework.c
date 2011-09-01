@@ -103,8 +103,8 @@ static double GeometricMean() {
 }
 
 void SetupSmallBenchmarks() {
-  RegisterBenchmark(strdup("Richards"), run_richards, 10000, 35302);
-  RegisterBenchmark(strdup("Deltablue"), run_deltablue, 100, 66118);
+  RegisterBenchmark(strdup("Richards"), run_richards, 10000, 2499257);
+  RegisterBenchmark(strdup("Deltablue"), run_deltablue, 100, 429919);
   RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 10, 64052288);
   RegisterBenchmark(strdup("Nbody"), run_nbody, 1000000, 73000000);
   RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 150020779);
@@ -117,8 +117,8 @@ void SetupSmallBenchmarks() {
 }
 
 void SetupLargeBenchmarks() {
-  RegisterBenchmark(strdup("Richards"), run_richards, 1000000, 35302);
-  RegisterBenchmark(strdup("Deltablue"), run_deltablue, 10000, 66118);
+  RegisterBenchmark(strdup("Richards"), run_richards, 1000000, 2499257);
+  RegisterBenchmark(strdup("Deltablue"), run_deltablue, 10000, 429919);
   RegisterBenchmark(strdup("Fannkuchredux"), run_fannkuch, 11, 64052288);
   RegisterBenchmark(strdup("Nbody"), run_nbody, 10000000, 73000000);
   RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 150020779);
