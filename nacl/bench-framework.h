@@ -13,6 +13,8 @@ typedef int (*report_function)(char *, ...);
 typedef struct _bench_info {
   char *name;
   bench_function run;
+  bench_function setup;
+  bench_function teardown;
   int time_ref;
   int param;
 } bench_info;
@@ -23,7 +25,7 @@ typedef struct {
   double score;   /* score for run */
 } run_data;
 
-void RegisterBenchmark(char *name, bench_function entry, int param, int time_ref);
+  void RegisterBenchmark(char *name, bench_function entry, int param, int time_ref, bench_function setup, bench_function teardown);
 
 extern const char *fasta_10k_ref_output;
 extern int fasta_10k_ref_output_len;
@@ -42,6 +44,10 @@ int run_spectralnorm(int p);
 
 int run_richards(int p);
 int run_deltablue(int p);
+int run_fft(int p);
+
+int setup_fft(int p);
+int teardown_fft(int p);
 
 enum benchmark_size_t { kBenchmarkSmall, kBenchmarkLarge };
 

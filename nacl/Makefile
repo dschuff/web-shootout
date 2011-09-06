@@ -7,6 +7,15 @@ BITS ?= 32
 LIB ?= newlib
 
 
+OS_NAME := $(shell uname -s)
+OS_SUBDIR := UNKNOWN
+ifeq ($(OS_NAME), Darwin)
+  OS_SUBDIR := mac
+endif
+ifeq ($(OS_NAME), Linux)
+  OS_SUBDIR := linux
+endif
+
 ifeq ($(BITS), 64)
   NACL_CC_BASE = x86_64-nacl
   ARCH_FLAG = -m64
@@ -17,14 +26,7 @@ else
   PNACL_ARCH = x86
 endif
 
-OS_NAME := $(shell uname -s)
-OS_SUBDIR := UNKNOWN
-ifeq ($(OS_NAME), Darwin)
-  OS_SUBDIR := mac
-endif
-ifeq ($(OS_NAME), Linux)
-  OS_SUBDIR := linux
-endif
+
 
 ifeq ($(LIB),glibc)
   NACL_CC_PATH = $(NACL_SVN_PATH)/toolchain/$(OS_SUBDIR)_x86/bin
@@ -39,10 +41,10 @@ CFLAGS = $(CCFLAGS) -std=gnu99
 CXXFLAGS = $(CCFLAGS)
 LIBS = -lm -lpthread
 LIBDIR = ../third_party/libinstall/$(BITS)/lib
-
+IRT_CORE=$(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86/runtime/irt_core_x86_$(BITS).nexe
 
 BENCHMARKS := fannkuchredux fasta revcomp binarytrees knucleotide nbody \
-		spectralnorm pidigits richards deltablue
+		spectralnorm pidigits richards deltablue fft
 OTHER_OBJS = bench-framework benchstringio fasta_10k_ref_output
 
 OBJS_NATIVE := $(BENCHMARKS:%=%.native.o) $(OTHER_OBJS:%=%.native.o)
@@ -96,7 +98,7 @@ clean: clean-native clean-nacl
 run-native:
 	./benchmarks$(BITS)
 run-nacl:
-	$(NACL_CC_PATH)/sel_ldr_x86_$(BITS) -a benchmarks$(BITS).nexe
+	$(NACL_CC_PATH)/sel_ldr_x86_$(BITS) -B $(IRT_CORE) -a benchmarks$(BITS).nexe
 
 .PHONY: clean-native clean-nacl clean-pnacl run-native run-nacl
 

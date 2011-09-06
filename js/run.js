@@ -31,6 +31,9 @@ load("fasta_10k_ref_output.js");
 load('io_replacement.js');
 load('biginteger.js');
 
+load('audio-fft-data.js');
+load('audio-fft.js');
+
 load('richards.js');
 load('deltablue.js');
 load('fannkuchredux.js');

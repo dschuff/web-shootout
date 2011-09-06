@@ -42,11 +42,11 @@ function fake_print_discard(s) {
   print_keep_index = (print_keep_index + 1) % max_keep_lines;
 }
 function InitializePrint(keep) {
+  print_output = new Array();
+  print_keep_index = 0;
   if (keep) {
-    print_output = new Array();
     print = fake_print_keep;
   } else {
-    print_output = new Array();
     print = fake_print_discard;
   }
 }
@@ -56,11 +56,11 @@ function CleanupPrint() {
 function VerifyOutput(ref_input, keep_fasta_output) {
 
   var output = print_output.join("\n");
-
   if (keep_fasta_output) {
-    fasta_output = output;
+      //fasta_output = output;
     fasta_output_array = print_output;
   }
+  print_output = null;
 
   if(!ref_input) return;
   if(ref_input != output) {
@@ -92,6 +92,7 @@ function readline_string() {//doesn't work?
 function readline_array() {
   s = fasta_output_array[start_index];
   start_index += 1;
+  print (s)
   return s;
 }
 function reset_readline_start() {

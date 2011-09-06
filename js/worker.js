@@ -21,6 +21,8 @@ importScripts('fasta_10k_ref_output.js');
 importScripts('io_replacement.js');
 importScripts('biginteger.js');
 
+importScripts('audio-fft-data.js');
+importScripts('audio-fft.js');
 importScripts('richards.js');
 importScripts('deltablue.js');
 importScripts('fannkuchredux.js');

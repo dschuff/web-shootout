@@ -6,6 +6,7 @@
 // specific to the benchmarks (e.g. parameters or normalization) goes here.
 
 var normalization_constants = Object(); 
+normalization_constants["FFT"] = 50000000;
 normalization_constants["Richards"] = 2499257;
 normalization_constants["DeltaBlue"] = 429919;
 normalization_constants["Fannkuchredux"] = 64052288;
@@ -18,9 +19,12 @@ normalization_constants["Knucleotide"] = 433893130;
 normalization_constants["Pidigits"] = 406976744;
 
 
-function SetupBenchmark(name, entrypoint, param) {
+function SetupBenchmark(name, entrypoint, param, setup, teardown) {
+  var empty = function() { };
+  var Setup = setup ? function(){ setup(param) } : empty;
+  var Teardown = teardown ? function(){ teardown(param) } : empty;
   var benchmark = new BenchmarkSuite(name, normalization_constants[name], [
-    new Benchmark(name, function () { entrypoint(param) } )
+    new Benchmark(name, function () { entrypoint(param) }, Setup, Teardown)
   ]);
 }
 
@@ -42,6 +46,7 @@ function SetupSmallBenchmarks() {
   SetupBenchmark("Revcomp", RevcompBenchmark, 0);
   SetupBenchmark("Binarytrees", BinarytreesBenchmark, 15);
   SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0);
+  SetupBenchmark("FFT", FFTBenchmark, 1024, generateFFTData, tearDownFFT);
   SetupBenchmark("Pidigits", PidigitsBenchmark, 1000);
   benchmarks = BenchmarkSuite.CountBenchmarks();
   SetRunModel("repeated");
@@ -57,6 +62,7 @@ function SetupLargeBenchmarks() {
   SetupBenchmark("Revcomp", RevcompBenchmark, 0);
   SetupBenchmark("Binarytrees", BinarytreesBenchmark, 18);
   SetupBenchmark("Knucleotide", KnucleotideBenchmark, 0);
+  SetupBenchmark("FFT", FFTBenchmark, 1024*1024, generateFFTData, tearDownFFT);
   SetupBenchmark("Pidigits", PidigitsBenchmark, 5000);
   benchmarks = BenchmarkSuite.CountBenchmarks();
   SetRunModel("once");

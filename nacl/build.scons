@@ -26,18 +26,21 @@ def MakeNaClModuleEnv(env, sources, module_name, arch_spec, is_debug=False):
                          sources,
                          variant_dir=module_name + subarch)
 
-nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True)
+nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True,
+                                         nacl_platform='.',
+                                         toolchain_arch='x86',
+                                         toolchain_variant='newlib')
 
 nacl_env.Append(CPPPATH=['include'],
                 EXTRA_CCFLAGS=['-mfpmath=sse', '-msse3', '-march=nocona'],
-                LIBS=['m', 'gmp', 'tcmalloc_minimal', 'pthread'])
+                LIBS=['fftw3', 'm', 'gmp', 'tcmalloc_minimal', 'pthread'])
 
 
 
 benchmark_sources = ['binarytrees.cc', 'fannkuchredux.c', 'fasta.c',
                      'revcomp.c', 'knucleotide.c', 'nbody.c',
                      'pidigits.c', 'spectralnorm.c', 'richards.c',
-                     'deltablue.c']
+                     'deltablue.c', 'fft.c']
 framework_sources = ['bench-framework.c', 'benchstringio.c', 'fasta_10k_ref_output.c']
 sources = benchmark_sources + framework_sources
 
