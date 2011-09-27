@@ -49,14 +49,14 @@ cli32 = MakeNaClModuleEnv(nacl_env, sources + ['cli.c'],
                           module_name='benchmarks',
                           arch_spec=nacl_utils.ARCH_SPECS['x86-32'])
 run_cli32 = nacl_env.Alias('run_32', source=cli32,
-                              action='$NACL_SEL_LDR32' + ' $SOURCE')
+                              action='$NACL_SEL_LDR32 -B $NACL_IRT_CORE32 $SOURCE')
 nacl_env.AlwaysBuild(run_cli32)
 
 cli64 = MakeNaClModuleEnv(nacl_env, sources + ['cli.c'],
                           module_name='benchmarks',
                           arch_spec=nacl_utils.ARCH_SPECS['x86-64'])
 run_cli64 = nacl_env.Alias('run_64', source=cli64,
-                              action='$NACL_SEL_LDR64' + ' $SOURCE')
+                              action='$NACL_SEL_LDR64 -B $NACL_IRT_CORE64 $SOURCE')
 nacl_env.AlwaysBuild(run_cli64)
 
 browser32 = MakeNaClModuleEnv(nacl_env, sources + ['pepper.c'],
