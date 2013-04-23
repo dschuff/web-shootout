@@ -41,7 +41,7 @@ function SetupSmallBenchmarks() {
   SetupBenchmark("DeltaBlue", DeltaBlueBenchmark, 100);
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 10);
   SetupBenchmark("Nbody", NbodyBenchmark, 1000000);
-  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350);
+  //SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 350);
   SetupBenchmark("Fasta", FastaBenchmark, 10000);
   SetupBenchmark("Revcomp", RevcompBenchmark, 0);
   SetupBenchmark("Binarytrees", BinarytreesBenchmark, 15);
@@ -57,7 +57,7 @@ function SetupLargeBenchmarks() {
   SetupBenchmark("DeltaBlue", DeltaBlueBenchmark, 10000);
   SetupBenchmark("Fannkuchredux", FannkuchBenchmark, 11);
   SetupBenchmark("Nbody", NbodyBenchmark, 10000000);
-  SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 5500);
+  //SetupBenchmark("Spectralnorm", SpectralnormBenchmark, 5500);
   SetupBenchmark("Fasta", FastaBenchmark, 3000000);
   SetupBenchmark("Revcomp", RevcompBenchmark, 0);
   SetupBenchmark("Binarytrees", BinarytreesBenchmark, 18);

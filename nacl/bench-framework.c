@@ -115,8 +115,8 @@ void SetupSmallBenchmarks() {
                     NULL, NULL);
   RegisterBenchmark(strdup("Nbody"), run_nbody, 1000000, 73000000,
                     NULL, NULL);
-  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 150020779,
-                    NULL, NULL);
+  /*RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 350, 150020779,
+                    NULL, NULL);*/
   RegisterBenchmark(strdup("Fasta"), run_fasta, 10000, 51667385, NULL, NULL);
   RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 23542857, NULL, NULL);
   RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 15, 383306452,
@@ -139,8 +139,8 @@ void SetupLargeBenchmarks() {
                     NULL, NULL);
   RegisterBenchmark(strdup("Nbody"), run_nbody, 10000000, 73000000,
                     NULL, NULL);
-  RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 150020779,
-                    NULL, NULL);
+  /*RegisterBenchmark(strdup("Spectralnorm"), run_spectralnorm, 5500, 150020779,
+                     NULL, NULL);*/
   RegisterBenchmark(strdup("Fasta"), run_fasta, 3000000, 51667385, NULL, NULL);
   RegisterBenchmark(strdup("Revcomp"), run_revcomp, 0, 23542857, NULL, NULL);
   RegisterBenchmark(strdup("Binarytrees"), run_binarytrees, 18, 383306452,

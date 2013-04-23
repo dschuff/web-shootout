@@ -44,7 +44,7 @@ function checkBrowserIsChrome() {
 
 function checkChromeVersion() {
     var ver = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
-    return ver >= 14;
+    return ver >= 21;
 }
 
 function checkPlugins() {
@@ -57,12 +57,13 @@ function checkPlugins() {
 }
 
 function checkNaclEnabled() {
-  return typeof benchmarkNaClModule !== "undefined" &&
-         typeof benchmarkNaClModule.postMessage !== "undefined";
+  return typeof benchmarkNaClModule[1] !== "undefined" &&
+         typeof benchmarkNaClModule[1].postMessage !== "undefined";
 }
 
 function Load() {
-  setupNaclBenchmark();
+  setupNaclBenchmark(1);
+  setupNaclBenchmark(2);
 
   document.getElementById("version").innerHTML = BenchmarkSuite.version;
 
@@ -72,7 +73,7 @@ function Load() {
   if (!checkBrowserIsChrome()) {
     warning_msg = "The Native Client Benchmark Suite requires Google Chrome to run. <br/>";
   } else if (!checkChromeVersion()) {
-    warning_msg = "The Native Client Benchmark Suite requires Google Chrome 14 or later. <br/>"
+    warning_msg = "The Native Client Benchmark Suite requires Google Chrome 21 or later. <br/>"
                 "Please download the Google Chrome Beta channel from "
                 "<a href=\"http://www.google.com/landing/chrome/beta\">here</a>";
   } else if (!checkPlugins()) {
@@ -90,8 +91,17 @@ function Load() {
   ShowWarningIfObsolete();
 }
 
-function naclBenchmarkFinished() {
-  runJSBenchmarks();
+function naclBenchmarksFinished() {
+  pnacl_module = document.getElementById("benchmark_nexe3");
+  if (pnacl_module == null) {
+    document.getElementById("module_wrapper3").innerHTML =
+'<embed name="nacl_module3" id="benchmark_nexe3" width=0 height=0' +
+' src="benchmark-pexe.nmf" type="application/x-nacl" />';
+   setupNaclListeners(document.getElementById("module_wrapper3"), 3)
+   setupNaclBenchmark(3);
+  } else {
+    runJSBenchmarks();
+  }
 }
 
 function jsBenchmarkFinished() {
@@ -106,17 +116,29 @@ function naclDoneWaiting() {
 
 <body onload="Load();">
 
-<div id="module_wrapper">
+<div id="module_wrapper1">
 <script type="text/javascript">
-  setupNaclListeners(document.getElementById('module_wrapper'));
+  setupNaclListeners(document.getElementById('module_wrapper1'), 1);
 </script>
-<embed name="nacl_module"
-       id="benchmark_nexe"
+<embed name="nacl_module1"
+       id="benchmark_nexe1"
        width=0 height=0
        src="benchmark.nmf"
        type="application/x-nacl" />
 </div>
+<div id="module_wrapper2">
+<script type="text/javascript">
+  setupNaclListeners(document.getElementById('module_wrapper2'), 2);
+</script>
+<embed name="nacl_module2"
+       id="benchmark_nexe2"
+       width=0 height=0
+       src="benchmark-pnacl-nexe.nmf"
+       type="application/x-nacl" />
+</div>
+<div id="module_wrapper3">
 
+</div>
 <div class="title">
 <h1>Native Client Benchmark Suite - version <span id="version">?</span>
 </h1></div>
@@ -138,13 +160,24 @@ latest version</a>.
 <em>Please be patient as these benchmarks may take several minutes to complete.</em>
 </p>
 
-<div id="nacl" class="run">
-  <h3>Native Client </h3>
-  <div id="nacl_status" class="status"></div>
-  <div id="nacl_results" class="results"></div>
+<div id="nacl1" class="run">
+  <h3>Native Client (nacl-gcc)</h3>
+  <div id="nacl_status1" class="status"></div>
+  <div id="nacl_results1" class="results"></div>
   <div class="spinner">X</div>
 </div>
-
+<div id="nacl2" class="run">
+  <h3>Native Client (pnacl nexe)</h3>
+  <div id="nacl_status2" class="status"></div>
+  <div id="nacl_results2" class="results"></div>
+  <div class="spinner">X</div>
+</div>
+<div id="nacl3" class="run">
+  <h3>Native Client (pnacl pexe)</h3>
+  <div id="nacl_status3" class="status"></div>
+  <div id="nacl_results3" class="results"></div>
+  <div class="spinner">X</div>
+</div>
 <div id="javascript" class="run">
   <h3>JavaScript</h3>
   <div id="js_status" class="status"></div>

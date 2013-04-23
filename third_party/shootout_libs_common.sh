@@ -9,16 +9,17 @@ if [ $OS_NAME = Linux ] ; then
   OS_SUBDIR=linux
 fi
 
-readonly PNACL_TC_BASE=${NACL_BASE}/native_client/toolchain/pnacl_linux_x86_64_newlib/bin
-readonly PNACL_GCC=${PNACL_TC_BASE}/pnacl-gcc
+#readonly PNACL_TC_BASE=${NACL_BASE}/native_client/toolchain/pnacl_linux_x86_64_newlib/bin
+readonly PNACL_TC_BASE=${NACL_SDK_ROOT}/toolchain/${OS_SUBDIR}_x86_pnacl/newlib/bin
+readonly PNACL_GCC=${PNACL_TC_BASE}/pnacl-clang
 readonly PNACL_CXX=${PNACL_TC_BASE}/pnacl-g++
 readonly PNACL_AR=${PNACL_TC_BASE}/pnacl-ar
 readonly PNACL_AS=${PNACL_TC_BASE}/pnacl-as
 readonly PNACL_LD=${PNACL_TC_BASE}/pnacl-ld
 readonly PNACL_RANLIB=${PNACL_TC_BASE}/pnacl-ranlib
 
-readonly NACL_TC_BASE=${NACL_BASE}/native_client/toolchain/${OS_SUBDIR}_x86/bin
-readonly NACL_TC_BASE_NEWLIB=${NACL_SDK_ROOT}/toolchain/${OS_SUBDIR}_x86/bin
+readonly NACL_TC_BASE=${NACL_SDK_ROOT}/toolchain/${OS_SUBDIR}_x86_glibc/bin
+readonly NACL_TC_BASE_NEWLIB=${NACL_SDK_ROOT}/toolchain/${OS_SUBDIR}_x86_newlib/bin
 
 readonly NACL_CC=${NACL_CC:-nacl-gcc-newlib}
 readonly NACL_ARCH=${NACL_ARCH:-x86-32}

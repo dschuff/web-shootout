@@ -1,8 +1,9 @@
 NACL_SDK_ROOT ?= /path/to/native_client_sdk
 # NACL_SVN_PATH only needed if we want to build with glibc
 NACL_SVN_PATH ?= /path/to/native_client/svn
-CC = gcc
-CXX = g++
+#CC = gcc
+#CXX = g++
+
 BITS ?= 32
 LIB ?= newlib
 
@@ -20,85 +21,112 @@ ifeq ($(BITS), 64)
   NACL_CC_BASE = x86_64-nacl
   ARCH_FLAG = -m64
   PNACL_ARCH = x86-64
+  NEWLIB_LIBDIR = newlib_x86_64
 else
   NACL_CC_BASE = i686-nacl
   ARCH_FLAG = -m32
-  PNACL_ARCH = x86
+  PNACL_ARCH = x86-32
+  NEWLIB_LIBDIR = newlib_x86_32
 endif
 
-
+include $(NACL_SDK_ROOT)/tools/common.mk
 
 ifeq ($(LIB),glibc)
-  NACL_CC_PATH = $(NACL_SVN_PATH)/toolchain/$(OS_SUBDIR)_x86/bin
+  NACL_CC_PATH = $(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86_glibc/bin
 else
-  NACL_CC_PATH = $(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86/bin
+  NACL_CC_PATH = $(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86_newlib/bin
 endif
+
+PNACL_PATH = $(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86_pnacl/newlib/bin
 
 NACLCC = $(NACL_CC_PATH)/$(NACL_CC_BASE)-gcc
 NACLCXX = $(NACL_CC_PATH)/$(NACL_CC_BASE)-g++
-CCFLAGS ?= -O3 -g -mfpmath=sse -msse3 -march=nocona -D_GNU_SOURCE
+PNACLCC = $(PNACL_PATH)/pnacl-clang
+PNACLCXX = $(PNACL_PATH)/pnacl-clang++
+PNACL_TRANSLATE = $(PNACL_PATH)/pnacl-translate
+
+CFLAGS_NP = -mfpmath=sse -msse3 -march=nocona
+CCFLAGS ?= -O3 -g -D_GNU_SOURCE
 CFLAGS = $(CCFLAGS) -std=gnu99
 CXXFLAGS = $(CCFLAGS)
-LIBS = -lm -lpthread
-LIBDIR = ../third_party/libinstall/$(BITS)/lib
-IRT_CORE=$(NACL_SDK_ROOT)/toolchain/$(OS_SUBDIR)_x86/runtime/irt_core_x86_$(BITS).nexe
+LIBS =  -lgmp -lfftw3 -lpthread -lm
+LIBDIRS = -L../third_party/libinstall/$(BITS)/lib -L$(NACL_SDK_ROOT)/lib/$(NEWLIB_LIBDIR)
+PNACL_LIBDIRS = -L../third_party/libinstall/pnacl/lib -L$(NACL_SDK_ROOT)/lib/pnacl
+IRT_CORE=$(NACL_SDK_ROOT)/tools/irt_core_x86_$(BITS).nexe
 
-BENCHMARKS := fannkuchredux fasta revcomp binarytrees knucleotide nbody \
-		spectralnorm pidigits richards deltablue fft
+BENCHMARKS := fannkuchredux fasta revcomp binarytrees knucleotide \
+		pidigits richards deltablue fft
+# spectralnorm
 OTHER_OBJS = bench-framework benchstringio fasta_10k_ref_output
 
-OBJS_NATIVE := $(BENCHMARKS:%=%.native.o) $(OTHER_OBJS:%=%.native.o)
-OBJS_NACL := $(BENCHMARKS:%=%.nacl.o) $(OTHER_OBJS:%=%.nacl.o)
-OBJS_PNACL := $(BENCHMARKS:%=%.bc) $(OTHER_OBJS:%=%.bc)
+OBJS_NATIVE := $(BENCHMARKS:%=%.native.o) $(OTHER_OBJS:%=%.native.o) nbody.native.o
+OBJS_NACL := $(BENCHMARKS:%=%.nacl.o) $(OTHER_OBJS:%=%.nacl.o) nbody.nacl.o
+OBJS_PNACL := $(BENCHMARKS:%=%.bc) $(OTHER_OBJS:%=%.bc) nbody-portable.bc
 
-all: native nacl
+all: native nacl pexe pnacl-nexe
 
 %.native.o: %.c
-	$(CC) $(ARCH_FLAG) -Iinclude -c $(CFLAGS) $< -o $@
+	$(CC) $(ARCH_FLAG) -Iinclude -c $(CFLAGS) $(CFLAGS_NP) $< -o $@
 %.native.o: %.cc
-	$(CXX) $(ARCH_FLAG) -Iinclude -c $(CXXFLAGS) $< -o $@
+	$(CXX) $(ARCH_FLAG) -Iinclude -c $(CXXFLAGS) $(CFLAGS_NP) $< -o $@
 %.nacl.o: %.c
-	$(NACLCC) -c -Iinclude $(CFLAGS) $< -o $@
+	$(NACLCC) -c -Iinclude -I$(INC_PATHS) $(CFLAGS) $(CFLAGS_NP) $< -o $@
 %.nacl.o: %.cc
-	$(NACLCXX) -c -Iinclude $(CXXFLAGS) $< -o $@
+	$(NACLCXX) -c -Iinclude -I$(INC_PATHS) $(CXXFLAGS) $(CFLAGS_NP) $< -o $@
 %.bc: %.c
-	pnacl-gcc -c $(CFLAGS) $< -o $@
+	$(PNACLCC) -c -Iinclude -I$(INC_PATHS) $(CFLAGS) $< -o $@
+%.bc: %.cc
+	$(PNACLCXX) -c -Iinclude -I$(INC_PATHS) $(CXXFLAGS) -std=c++11 $< -o $@
 
 native: $(OBJS_NATIVE) cli.native.o
 	$(CXX) $(ARCH_FLAG) $(OBJS_NATIVE) cli.native.o -o \
 	  benchmarks$(BITS) $(LIBS) -lgmp
 
 nacl: benchmarks$(BITS).nexe benchmarks_browser$(BITS).nexe
-pepper: benchmarks_browser$(BITS).nexe
+pexe: benchmarks.pexe benchmarks_browser.pexe
+arm: benchmarks-arm.nexe benchmarks_browser-arm.nexe
+pnacl-nexe: benchmarks_pexe$(BITS).nexe benchmarks_browser_pexe$(BITS).nexe
 
 benchmarks$(BITS).nexe: $(OBJS_NACL) cli.nacl.o
-#	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) -lgmp $(LIBS)
-	$(NACLCXX) $(OBJS_NACL) cli.nacl.o -o $@ -L$(LIBDIR) $(LIBS) \
-          -lgmp -ltcmalloc_minimal -lpthread
+	$(NACLCXX) $^ -o $@ $(LIBDIRS) $(LIBS)
+
+benchmarks-arm.nexe: benchmarks.pexe
+	$(PNACL_TRANSLATE) -arch arm $^ -o $@
 
 benchmarks_browser$(BITS).nexe: $(OBJS_NACL) pepper.nacl.o
-	$(NACLCXX) $(OBJS_NACL)  pepper.nacl.o -o $@ -L$(LIBDIR) $(LIBS) \
-          -lppapi -lgmp -ltcmalloc_minimal -lpthread
+	$(NACLCXX) $^ -o $@ $(LIBDIRS) -lppapi $(LIBS)
 	chmod a+r *.nexe
 
-pnacl: $(OBJS_PNACL) cli.bc
-	pnacl-g++ $(OBJS_PNACL) -o benchmarks.pexe -ltcmalloc_minimal -lpthread
-	pnacl-opt -std-link-opts -disable-internalize benchmarks.pexe -o benchmarks.pexe
-	pnacl-translate -arch $(PNACL_ARCH) benchmarks.pexe -o benchmarks_pnacl.nexe
+benchmarks_browser-arm.nexe: benchmarks_browser.pexe
+	$(PNACL_TRANSLATE) -arch arm $^ -o $@
+
+benchmarks.pexe: $(OBJS_PNACL) cli.bc
+	$(PNACLCXX) -O3 $^ -o $@ $(PNACL_LIBDIRS) -lppapi $(LIBS)
+
+benchmarks_pexe$(BITS).nexe: benchmarks.pexe
+	$(PNACL_TRANSLATE) -arch $(PNACL_ARCH) $^ -o $@
+
+benchmarks_browser.pexe: $(OBJS_PNACL) pepper.bc
+	$(PNACLCXX) -O3 $^ -o $@ $(PNACL_LIBDIRS) -lppapi $(LIBS)
+
+benchmarks_browser_pexe$(BITS).nexe: benchmarks_browser.pexe
+	$(PNACL_TRANSLATE) -arch $(PNACL_ARCH) $^ -o $@
 
 clean-native:
 	rm -f *.native.o
 clean-nacl:
 	rm -f *.nacl.o
 clean-pnacl:
-	rm -f *.bc *.pexe benchmarks_pnacl.nexe *.ll *-.o
-clean: clean-native clean-nacl
+	rm -f *.bc  *.ll *-.o
+clean: clean-native clean-nacl clean-pnacl
 
 
 run-native:
 	./benchmarks$(BITS)
 run-nacl:
-	$(NACL_CC_PATH)/sel_ldr_x86_$(BITS) -B $(IRT_CORE) -a benchmarks$(BITS).nexe
+	$(NACL_SDK_ROOT)/tools/sel_ldr_x86_$(BITS) -B $(IRT_CORE) -a benchmarks$(BITS).nexe
+run-pnacl:
+	$(NACL_SDK_ROOT)/tools/sel_ldr_x86_$(BITS) -B $(IRT_CORE) -a benchmarks_pexe$(BITS).nexe
 
 .PHONY: clean-native clean-nacl clean-pnacl run-native run-nacl
 

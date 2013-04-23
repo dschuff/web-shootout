@@ -1,80 +1,108 @@
-var benchmarkNaClModule = null;
+var benchmarkNaClModule = Array();
+var errorStatus = Array();
+var moduleRunning = 1;
+var totalModules = 0;
 
-function setupNaclBenchmark() {
-  updateNaclStatus('Loading module...');
-  benchmarkNaClModule = document.getElementById('benchmark_nexe');
+function setupNaclBenchmark(num) {
+  updateNaclStatus(num, 'Loading module...');
+  errorStatus[num] = false;
+  benchmarkNaClModule[num] = document.getElementById('benchmark_nexe'+ String(num));
 }
 
-function updateNaclResults(results) {
-  resultbox = document.getElementById('nacl_results');
+function updateNaclResults(num, results) {
+  resultbox = document.getElementById('nacl_results' + String(num));
   resultbox.innerHTML += results + '<br>';
 }
 
 // Handle a message coming from the NaCl module.
-function handleNaclMessage(message_event) {
+function handleNaclMessage(num, message_event) {
   var msg = message_event.data;
-  //console.log("nexe said: " + msg);
+  //console.log("nexe said: " + message_event);
   if (msg.search(":") != -1) {
     if (msg.search("Score") != -1) {
-      benchmarkNaClModule.removeEventListener('message', handleNaclMessage, false);
-      updateNaclStatus(msg);
-      document.getElementById('nacl').className = "run";
-      naclBenchmarkFinished();
+      benchmarkNaClModule[num].removeEventListener('message', handleNaclMessage, false);
+      updateNaclStatus(num, msg);
+      document.getElementById('nacl'+String(num)).className = "run";
+      naclBenchmarkFinished(num);
     } else if (msg.search("Score") == -1) {
-      updateNaclResults(msg);
+      updateNaclResults(num, msg);
     } else {
       console.log("unknown NaCl message: " + msg);
     }
   } else {
-    updateNaclStatus(msg);
+    updateNaclStatus(num, msg);
   }
 }
 
-function clearNaclResults() {
-  var results = document.getElementById("nacl_status");
+function clearNaclResults(num) {
+  var results = document.getElementById("nacl_status" + String(num));
   // Only clear after we have completed a run
   if (results.innerHTML.search("Score:") != -1) {
-    document.getElementById("nacl_results").innerHTML = "<br />";
+    document.getElementById("nacl_results" + String(num)).innerHTML = "<br />";
   }
 }
 
-function runSmallNaclBenchmarks() {
-  clearNaclResults();
-  benchmarkNaClModule.postMessage('runBenchmarks small');
+function runSmallNaclBenchmarks(num) {
+  clearNaclResults(num);
+  benchmarkNaClModule[num].postMessage('runBenchmarks small');
 }
-function runLargeNaclBenchmarks() {
-  clearNaclResults();
-  benchmarkNaClModule.postMessage('runBenchmarks large');
-}
-
-function runNaclBenchmarks() {
-  benchmarkNaClModule.addEventListener('message', handleNaclMessage, false);
-  document.getElementById('nacl').className = "run running";
-  runLargeNaclBenchmarks();
+function runLargeNaclBenchmarks(num) {
+  clearNaclResults(num);
+  benchmarkNaClModule[num].postMessage('runBenchmarks large');
 }
 
-function updateNaclStatus(opt_message) {
+function runNaclBenchmarks(num) {
+  if (errorStatus[num]) return naclBenchmarkFinished(num);
+  benchmarkNaClModule[num].addEventListener('message', function(arg) {
+    handleNaclMessage(num, arg); }, false);
+  document.getElementById('nacl' + String(num)).className = "run running";
+  runLargeNaclBenchmarks(num);
+}
+
+function updateNaclStatus(num, opt_message) {
   if (opt_message)
     statusText = opt_message;
-  var NaclStatus = document.getElementById('nacl_status');
+  var NaclStatus = document.getElementById('nacl_status'+String(num));
   if (NaclStatus) {
     NaclStatus.innerHTML = statusText;
   }
 }
 
-function naclModuleDidLoad() {
+function naclModuleDidLoad(num) {
   naclDoneWaiting();
-  runNaclBenchmarks();
+  updateNaclStatus(num, "Loaded");
+  if (moduleRunning == num) {
+    runNaclBenchmarks(num);
+  }
 }
 
-function naclModuleError() {
+function naclModuleError(num) {
   naclDoneWaiting();
-  console.log(benchmarkNaClModule.lastError);
-  updateNaclStatus("LOAD ERROR");
-  naclBenchmarkFinished();
+  console.log(benchmarkNaClModule[num].lastError);
+  updateNaclStatus(num, "LOAD ERROR");
+  errorStatus[num] = true;
+  //naclBenchmarkFinished(num);
 }
 
-function setupNaclListeners(module_wrapper) {
-  module_wrapper.addEventListener('load', naclModuleDidLoad, true);
-  module_wrapper.addEventListener('error', naclModuleError, true);
+function setupNaclListeners(module_wrapper, num) {
+  if (num > totalModules) {
+    totalModules = num;
+  }
+  module_wrapper.addEventListener('load', function() {
+    naclModuleDidLoad(num);}, true);
+  module_wrapper.addEventListener('error', function() {
+    naclModuleError(num);}, true);
+}
+
+function naclBenchmarkFinished(num) {
+  if (num != moduleRunning) {
+    alert('BenchmarkFinished='+ String(num) +' but moduleRunning=' +
+          String(moduleRunning));
+  }
+  moduleRunning += 1;
+  if (moduleRunning <= totalModules) {
+    runNaclBenchmarks(moduleRunning);
+  } else {
+    naclBenchmarksFinished();
+  }
 }
