@@ -1,0 +1,1 @@
+Compares Javascript and Native Client implementations of several benchmarks from the Computer Language Benchmarks Game (aka Computer Language Shootout). Javascript version uses the driver framework from the V8 benchmarks.
